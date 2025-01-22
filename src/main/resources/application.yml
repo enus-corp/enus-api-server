@@ -1,0 +1,48 @@
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/enus}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:password}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      pool-name: enus-connection-pool
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 300000
+      connection-timeout: 20000
+      max-lifetime: 1200000
+      auto-commit: true
+      connection-test-query: SELECT 1
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    open-in-view: false
+springdoc:
+  packages-to-scan: com.enus.newsletter.domain
+  default-consumes-media-type: application/json;charset=UTF-8
+  default-produces-media-type: application/json;charset=UTF-8
+  swagger-ui:
+    path: /
+    disable-swagger-default-url: true
+    display-request-duration: true
+    operations-sorter: alpha
+
+# Liquibase
+#  liquibase:
+#    change-log: classpath:db/changelog/db.changelog-master.yaml
+
+# Logging
+
+logging.level.org.springframework: info
+logging.level.org.springframework.security: trace
+
+# JWT
+jwt.security.secret-key: 7f3080cd92f5cbd8137a21f0e691b5da58079cde71260ab07a699859b4877f6e
+jwt.security.access-token.expiration: 900000 # 15 Minutes
+jwt.security.refresh-token.expiration: 604800000 # 7 Days
+
