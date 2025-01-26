@@ -3,6 +3,7 @@ package com.enus.newsletter.exception.auth;
 import com.enus.newsletter.exception.IErrorCode;
 
 public enum AuthErrorCode implements IErrorCode {
+    INVALID_TOKEN(1000, "Invalid Token"),
     INVALID_CREDENTIALS(1001, "Invalid Credentials"),
     ACCOUNT_LOCKED(1002, "Account Locked"),
     TOKEN_EXPIRED(1003, "Token Expired"),
