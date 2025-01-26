@@ -6,10 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j(topic = "UserController")
 @Tag(name="User", description = "User API")
 @RestController
 @RequestMapping("/api/user")
-@Slf4j
 public class UserController {
     private final UserService userService;
 
