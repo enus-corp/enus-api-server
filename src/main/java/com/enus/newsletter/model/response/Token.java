@@ -9,7 +9,10 @@ import lombok.Data;
 @Builder
 public class Token {
     @JsonProperty("token")
-    private String token;
+    private String accessToken;
+
+    @JsonProperty("refresh")
+    private String refreshToken;
 
     @JsonProperty("expires_in")
     private long expiresIn;
