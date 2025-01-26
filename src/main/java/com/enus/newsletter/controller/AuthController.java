@@ -14,10 +14,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
 @Tag(name="Auth", description = "Authentication")
 @Slf4j
 @RestController
@@ -31,95 +29,56 @@ public class AuthController {
 
     @PostMapping("signup")
     public ResponseEntity<GeneralServerResponse<UserEntity>> signup(@Valid @RequestBody SignupRequest dto) {
-      log.info(">>>>>>>>> Signup request: {}", dto);
-        try {
-            UserEntity user = authService.signup(dto);
-            GeneralServerResponse<UserEntity> response = new GeneralServerResponse<UserEntity>(
-                    false,
-                    "Successfully created user",
-                    200,
-                    user
-            );
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(
-                    new GeneralServerResponse<>(
-                    true,
-                    e.getMessage(),
-                    400,
-                    null
-            ));
-        }
+      log.info("---------------- Signup request: {} ----------------", dto);
+      UserEntity user = authService.signup(dto);
+      GeneralServerResponse<UserEntity> response = new GeneralServerResponse<UserEntity>(
+            false,
+            "Successfully created user",
+            200,
+            user
+      );
+
+      log.info("---------------- Signup response: {} ----------------", response);
+      return ResponseEntity.ok(response);
+
     }
 
     @PostMapping("/signin")
     public ResponseEntity<GeneralServerResponse<Token>> signin(@RequestBody SigninRequest dto) {
-        try {
-            Token token = authService.authenticate(dto);
-            GeneralServerResponse<Token> response = new GeneralServerResponse<Token>(
-                    false,
-                    "Successfully authenticated user",
-                    200,
-                    token
-            );
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(
-                    new GeneralServerResponse<>(
-                    true,
-                    e.getMessage(),
-                    400,
-                    null
-            ));
-        }
+        Token token = authService.authenticate(dto);
+        GeneralServerResponse<Token> response = new GeneralServerResponse<Token>(
+                false,
+                "Successfully authenticated user",
+                200,
+                token
+        );
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/verifyEmail")
     public ResponseEntity<GeneralServerResponse<VerifyViaEmail>> verifyEmail(@Valid @RequestBody VerifyViaEmailRequest dto) {
-        try {
-            VerifyViaEmail verification = authService.verifyEmail(dto);
-            return ResponseEntity.ok(
-                    new GeneralServerResponse<>(
-                            false,
-                            "Successfully verified email",
-                            200,
-                            verification
-                    )
-            );
-
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(
-                    new GeneralServerResponse<>(
-                    true,
-                    e.getMessage(),
-                    400,
-                    null
-            ));
-        }
+        VerifyViaEmail verification = authService.verifyEmail(dto);
+        return ResponseEntity.ok(
+                new GeneralServerResponse<>(
+                        false,
+                        "Successfully verified email",
+                        200,
+                        verification
+                )
+        );
     }
 
     @PostMapping("/resetPassword")
     public ResponseEntity<GeneralServerResponse> resetPassword(@Valid @RequestBody ResetPasswordRequest dto) {
-        try {
-            authService.resetPassword(dto);
-            return ResponseEntity.ok(
-                    new GeneralServerResponse<>(
-                            false,
-                            "Successfully reset password",
-                            200,
-                            null
-                    )
-            );
-
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(
-                    new GeneralServerResponse<>(
-                    true,
-                    e.getMessage(),
-                    400,
-                    null
-            ));
-        }
+        authService.resetPassword(dto);
+        return ResponseEntity.ok(
+                new GeneralServerResponse<>(
+                        false,
+                        "Successfully reset password",
+                        200,
+                        null
+                )
+        );
     }
 
     @PostMapping("/logout")

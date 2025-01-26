@@ -8,6 +8,7 @@ package com.enus.newsletter.service;
 import com.enus.newsletter.db.entity.UserEntity;
 import com.enus.newsletter.db.repository.PasswordResetTokenRepository;
 import com.enus.newsletter.db.repository.UserRepository;
+import com.enus.newsletter.exception.auth.AuthException;
 import com.enus.newsletter.exception.user.UserException;
 import com.enus.newsletter.model.request.ResetPasswordRequest;
 import com.enus.newsletter.model.request.SigninRequest;
@@ -49,7 +50,7 @@ public class AuthService {
         return userRepository.createUser(dto);
     }
 
-    public Token authenticate(SigninRequest dto) throws UserException {
+    public Token authenticate(SigninRequest dto) throws UserException, AuthException {
         log.info("Processing authentication for user: {}", dto);
 
         // create authentication token with username and password
@@ -77,7 +78,7 @@ public class AuthService {
         }
     }
 
-    public VerifyViaEmail verifyEmail(VerifyViaEmailRequest dto) throws Exception {
+    public VerifyViaEmail verifyEmail(VerifyViaEmailRequest dto) throws UserException, AuthException {
         UserEntity user = userRepository.verifyEmail(dto.getEmail());
 
         String responseCode = generateVerificationCode();
@@ -88,7 +89,7 @@ public class AuthService {
                 .build();
     }
 
-    public void resetPassword(ResetPasswordRequest dto) throws UserException{
+    public void resetPassword(ResetPasswordRequest dto) throws UserException, AuthException{
         // temporary implementation
         passwordResetTokenRepository.resetPassword(dto);
 

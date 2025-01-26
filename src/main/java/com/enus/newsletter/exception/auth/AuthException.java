@@ -1,21 +1,17 @@
 package com.enus.newsletter.exception.auth;
 
-public class AuthException extends Exception {
-    private final AuthErrorCode errorCode;
+import com.enus.newsletter.exception.CustomBaseException;
 
+public class AuthException extends CustomBaseException {
     public AuthException(AuthErrorCode errorCode) {
-        super(errorCode.getMessage());
-        this.errorCode = errorCode;
+        super(errorCode);
     }
 
     public AuthException(AuthErrorCode errorCode, String message) {
-        super(message);
-        this.errorCode = errorCode;
+        super(errorCode, message);
     }
 
     public AuthException(AuthErrorCode errorCode, Throwable cause) {
-        super(errorCode.getMessage(), cause);
-        this.errorCode = errorCode;
+        super(errorCode, cause);
     }
-
 }
