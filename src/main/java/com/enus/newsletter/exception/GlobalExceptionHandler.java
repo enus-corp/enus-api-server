@@ -1,7 +1,5 @@
 package com.enus.newsletter.exception;
 
-import com.enus.newsletter.exception.auth.AuthException;
-import com.enus.newsletter.exception.user.UserException;
 import com.enus.newsletter.system.GeneralServerResponse;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -10,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
@@ -19,8 +16,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-
 
 // Handle exceptions thrown by methods annotated with @RequestMapping
 @Log4j2
@@ -46,6 +41,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(CustomBaseException.class)
     public ResponseEntity<GeneralServerResponse<Void>> handleException(CustomBaseException exception) {
+        log.info("---------------- Exception Handler: {} ----------------", exception.getMessage());
         return ResponseEntity.ok(
                 new GeneralServerResponse<Void>(
                         false,
