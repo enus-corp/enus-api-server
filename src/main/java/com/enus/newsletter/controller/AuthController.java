@@ -17,7 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name="Auth", description = "Authentication")
-@Slf4j
+@Slf4j(topic = "AuthController")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -69,10 +69,10 @@ public class AuthController {
     }
 
     @PostMapping("/resetPassword")
-    public ResponseEntity<GeneralServerResponse> resetPassword(@Valid @RequestBody ResetPasswordRequest dto) {
+    public ResponseEntity<GeneralServerResponse<Void>> resetPassword(@Valid @RequestBody ResetPasswordRequest dto) {
         authService.resetPassword(dto);
         return ResponseEntity.ok(
-                new GeneralServerResponse<>(
+                new GeneralServerResponse<Void>(
                         false,
                         "Successfully reset password",
                         200,
@@ -86,9 +86,16 @@ public class AuthController {
         return ResponseEntity.ok("logout");
     }
 
-    @PostMapping("/refreshToken")
-    public ResponseEntity<String> refreshToken(@RequestBody String entity) {
-        return ResponseEntity.ok("refreshToken");
+    @PostMapping("/refresh")
+    public ResponseEntity<GeneralServerResponse<Token>> refresh(@RequestBody String refreshToken) {
+        Token token = authService.refreshToken(refreshToken);
+        GeneralServerResponse<Token> response = new GeneralServerResponse<Token>(
+                false,
+                "Successfully refreshed new token",
+                200,
+                token
+        );
+        return ResponseEntity.ok(response);
     }
 
 

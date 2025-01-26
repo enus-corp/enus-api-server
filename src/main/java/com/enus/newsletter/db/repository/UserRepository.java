@@ -65,4 +65,9 @@ public class UserRepository{
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
         return userRepository.save(user);
     }
+
+    public UserEntity findByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND, UserErrorCode.USER_NOT_FOUND.getMessage()));
+    }
 }

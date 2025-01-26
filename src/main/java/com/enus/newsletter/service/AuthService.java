@@ -8,6 +8,7 @@ package com.enus.newsletter.service;
 import com.enus.newsletter.db.entity.UserEntity;
 import com.enus.newsletter.db.repository.PasswordResetTokenRepository;
 import com.enus.newsletter.db.repository.UserRepository;
+import com.enus.newsletter.exception.auth.AuthErrorCode;
 import com.enus.newsletter.exception.auth.AuthException;
 import com.enus.newsletter.exception.user.UserException;
 import com.enus.newsletter.model.request.ResetPasswordRequest;
@@ -53,29 +54,31 @@ public class AuthService {
     public Token authenticate(SigninRequest dto) throws UserException, AuthException {
         log.info("Processing authentication for user: {}", dto);
 
-        // create authentication token with username and password
+        // Get user credentials
         Authentication auth = new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword());
 
         try {
             // validate credentials using authentication manager
+            // Throws exception if authentication fails
             Authentication authResult = authenticationManager.authenticate(auth);
 
             // get authenticated user details from the authentication result
-            UserDetails u = (UserDetails) authResult.getPrincipal();
-
-            UserEntity user = userRepository.getOne(u.getUsername());
+            UserDetails user = (UserDetails) authResult.getPrincipal();
 
             String jwtToken = jwtService.generateToken(user);
 
             return Token
                     .builder()
-                    .token(jwtToken)
+                    .accessToken(jwtService.generateToken(user))
+                    .refreshToken(jwtService.generateRefreshToken(user))
                     .expiresIn(jwtService.getExpirationTime())
                     .build();
 
         } catch (AuthenticationException e) {
-            throw new BadCredentialsException("Invalid username or password");
+            throw new AuthException(AuthErrorCode.INVALID_CREDENTIALS, "Authentication failed. Invalid username or password");
         }
+
+
     }
 
     public VerifyViaEmail verifyEmail(VerifyViaEmailRequest dto) throws UserException, AuthException {
@@ -93,6 +96,22 @@ public class AuthService {
         // temporary implementation
         passwordResetTokenRepository.resetPassword(dto);
 
+    }
+
+    public Token refreshToken(String refreshToken) throws UserException, AuthException {
+        String username = jwtService.extractUsername(refreshToken);
+        UserDetails user = userRepository.findByUsername(username);
+
+        if (jwtService.isTokenValid(refreshToken, user)) {
+            return Token
+                    .builder()
+                    .accessToken(jwtService.generateToken(user))
+                    .refreshToken(refreshToken)
+                    .expiresIn(jwtService.getExpirationTime()) // TODO: Have to check if expiration time is correct
+                    .build();
+        } else {
+            throw new AuthException(AuthErrorCode.INVALID_TOKEN, "Invalid token");
+        }
     }
 
 
