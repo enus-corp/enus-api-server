@@ -13,7 +13,4 @@ public class Token {
 
     @JsonProperty("refresh")
     private String refreshToken;
-
-    @JsonProperty("expires_in")
-    private long expiresIn;
 }
