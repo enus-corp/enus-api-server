@@ -100,6 +100,9 @@ public class AuthService {
 
     public Token refreshToken(String refreshToken) throws UserException, AuthException {
         String username = jwtService.extractUsername(refreshToken);
+        if (username == null) {
+            throw new AuthException(AuthErrorCode.INVALID_TOKEN, AuthErrorCode.INVALID_TOKEN.getMessage());
+        }
         UserDetails user = userRepository.findByUsername(username);
 
         if (jwtService.isTokenValid(refreshToken, user)) {
