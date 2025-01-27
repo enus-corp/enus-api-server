@@ -20,13 +20,13 @@ import com.enus.newsletter.model.response.VerifyViaEmail;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.Random;
 
 @Slf4j
@@ -65,13 +65,13 @@ public class AuthService {
             // get authenticated user details from the authentication result
             UserDetails user = (UserDetails) authResult.getPrincipal();
 
-            String jwtToken = jwtService.generateToken(user);
+            String accessToken = jwtService.generateAccessToken(user);
+            String refreshToken = jwtService.generateRefreshToken(user);
 
             return Token
                     .builder()
-                    .accessToken(jwtService.generateToken(user))
-                    .refreshToken(jwtService.generateRefreshToken(user))
-                    .expiresIn(jwtService.getExpirationTime())
+                    .accessToken(accessToken)
+                    .refreshToken(refreshToken)
                     .build();
 
         } catch (AuthenticationException e) {
@@ -103,11 +103,12 @@ public class AuthService {
         UserDetails user = userRepository.findByUsername(username);
 
         if (jwtService.isTokenValid(refreshToken, user)) {
+            String accessToken = jwtService.generateAccessToken(user);
+
             return Token
                     .builder()
-                    .accessToken(jwtService.generateToken(user))
+                    .accessToken(accessToken)
                     .refreshToken(refreshToken)
-                    .expiresIn(jwtService.getExpirationTime()) // TODO: Have to check if expiration time is correct
                     .build();
         } else {
             throw new AuthException(AuthErrorCode.INVALID_TOKEN, "Invalid token");
