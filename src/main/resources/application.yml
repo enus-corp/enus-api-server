@@ -23,7 +23,7 @@ spring:
         format_sql: true
     open-in-view: false
 springdoc:
-  packages-to-scan: com.enus.newsletter.domain
+  packages-to-scan: com.enus.newsletter.controller
   default-consumes-media-type: application/json;charset=UTF-8
   default-produces-media-type: application/json;charset=UTF-8
   swagger-ui:
