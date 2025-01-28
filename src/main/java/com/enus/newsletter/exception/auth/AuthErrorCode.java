@@ -7,7 +7,8 @@ public enum AuthErrorCode implements IErrorCode {
     INVALID_CREDENTIALS(1001, "Invalid Credentials"),
     ACCOUNT_LOCKED(1002, "Account Locked"),
     TOKEN_EXPIRED(1003, "Token Expired"),
-    USER_CREATION_FAILED(1004, "User creation failed")
+    USER_CREATION_FAILED(1004, "User creation failed"),
+    ACCOUNT_EXPIRED(1005, "Account expired")
     ;
 
 
