@@ -6,6 +6,7 @@
 package com.enus.newsletter.service;
 
 import com.enus.newsletter.db.entity.UserEntity;
+import com.enus.newsletter.db.repository.LoginHistoryRepository;
 import com.enus.newsletter.db.repository.PasswordResetTokenRepository;
 import com.enus.newsletter.db.repository.UserRepository;
 import com.enus.newsletter.exception.auth.AuthErrorCode;
@@ -34,12 +35,14 @@ import java.util.Random;
 @Transactional
 public class AuthService {
     private final AuthenticationManager authenticationManager;
+    private final LoginHistoryRepository loginHistoryRepository;
     private final UserRepository userRepository;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final JwtService jwtService;
 
-    public AuthService(AuthenticationManager authenticationManager, UserRepository userRepository, PasswordResetTokenRepository passwordResetTokenRepository, JwtService jwtService) {
+    public AuthService(AuthenticationManager authenticationManager, LoginHistoryRepository loginHistoryRepository, UserRepository userRepository, PasswordResetTokenRepository passwordResetTokenRepository, JwtService jwtService) {
         this.authenticationManager = authenticationManager;
+        this.loginHistoryRepository = loginHistoryRepository;
         this.userRepository = userRepository;
         this.passwordResetTokenRepository = passwordResetTokenRepository;
         this.jwtService = jwtService;
@@ -51,34 +54,71 @@ public class AuthService {
         return userRepository.createUser(dto);
     }
 
-    public Token authenticate(SigninRequest dto) throws UserException, AuthException {
+    public Token authenticate(SigninRequest dto, String ip) throws UserException, AuthException {
         log.info("Processing authentication for user: {}", dto);
 
         // Get user credentials
         Authentication auth = new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword());
+        Authentication authResult;
 
         try {
             // validate credentials using authentication manager
             // Throws exception if authentication fails
-            Authentication authResult = authenticationManager.authenticate(auth);
-
-            // get authenticated user details from the authentication result
-            UserDetails user = (UserDetails) authResult.getPrincipal();
-
-            String accessToken = jwtService.generateAccessToken(user);
-            String refreshToken = jwtService.generateRefreshToken(user);
-
-            return Token
-                    .builder()
-                    .accessToken(accessToken)
-                    .refreshToken(refreshToken)
-                    .build();
+            authResult = authenticationManager.authenticate(auth);
 
         } catch (AuthenticationException e) {
+            loginHistoryRepository.saveLoginHistory(
+                    dto.getUsername(),
+                    ip,
+                    0,
+                    "Authentication failed. Invalid username or password"
+            );
+
             throw new AuthException(AuthErrorCode.INVALID_CREDENTIALS, "Authentication failed. Invalid username or password");
         }
 
+        // get authenticated user details from the authentication result
+        UserDetails user = (UserDetails) authResult.getPrincipal();
 
+        log.info("User is  -> {}", user);
+
+        if (!user.isAccountNonLocked()) {
+            loginHistoryRepository.saveLoginHistory(
+                    dto.getUsername(),
+                    ip,
+                    0,
+                    "Authentication failed. Account is locked"
+            );
+
+            throw new AuthException(AuthErrorCode.ACCOUNT_LOCKED, "Authentication failed. Account is locked");
+        }
+
+        if (!user.isAccountNonExpired()) {
+            loginHistoryRepository.saveLoginHistory(
+                    dto.getUsername(),
+                    ip,
+                    0,
+                    "Authentication failed. Account is expired"
+            );
+
+            throw new AuthException(AuthErrorCode.ACCOUNT_EXPIRED, "Authentication failed. Account is expired");
+        }
+
+        loginHistoryRepository.saveLoginHistory(
+                dto.getUsername(),
+                ip,
+                1,
+                "Authentication successful"
+        );
+
+        String accessToken = jwtService.generateAccessToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+
+        return Token
+                .builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
     }
 
     public VerifyViaEmail verifyEmail(VerifyViaEmailRequest dto) throws UserException, AuthException {
