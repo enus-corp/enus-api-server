@@ -21,6 +21,8 @@ import com.enus.newsletter.model.response.VerifyViaEmail;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -30,9 +32,8 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.Random;
 
-@Slf4j
+@Slf4j(topic = "AUTH_SERVICE")
 @Service
-@Transactional
 public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final LoginHistoryRepository loginHistoryRepository;
@@ -66,23 +67,9 @@ public class AuthService {
             // Throws exception if authentication fails
             authResult = authenticationManager.authenticate(auth);
 
-        } catch (AuthenticationException e) {
-            loginHistoryRepository.saveLoginHistory(
-                    dto.getUsername(),
-                    ip,
-                    0,
-                    "Authentication failed. Invalid username or password"
-            );
+        } catch (LockedException e) {
+            userRepository.handleLoginAttempt(dto.getUsername(), false);
 
-            throw new AuthException(AuthErrorCode.INVALID_CREDENTIALS, "Authentication failed. Invalid username or password");
-        }
-
-        // get authenticated user details from the authentication result
-        UserDetails user = (UserDetails) authResult.getPrincipal();
-
-        log.info("User is  -> {}", user);
-
-        if (!user.isAccountNonLocked()) {
             loginHistoryRepository.saveLoginHistory(
                     dto.getUsername(),
                     ip,
@@ -91,19 +78,38 @@ public class AuthService {
             );
 
             throw new AuthException(AuthErrorCode.ACCOUNT_LOCKED, "Authentication failed. Account is locked");
-        }
+        } catch (DisabledException e) {
+            userRepository.handleLoginAttempt(dto.getUsername(), false);
 
-        if (!user.isAccountNonExpired()) {
             loginHistoryRepository.saveLoginHistory(
                     dto.getUsername(),
                     ip,
                     0,
-                    "Authentication failed. Account is expired"
+                    "Authentication failed. Account is disabled"
             );
 
-            throw new AuthException(AuthErrorCode.ACCOUNT_EXPIRED, "Authentication failed. Account is expired");
+            throw new AuthException(AuthErrorCode.ACCOUNT_DISABLED, "Authentication failed. Account is disabled");
+        } catch (AuthenticationException e) {
+            userRepository.handleLoginAttempt(dto.getUsername(), false);
+
+            loginHistoryRepository.saveLoginHistory(
+                    dto.getUsername(),
+                    ip,
+                    0,
+                    "Authentication failed. Invalid username or password"
+            );
+
+            throw new AuthException(AuthErrorCode.INVALID_CREDENTIALS, "Authentication failed. Invalid username or password");
+        } finally {
+            log.info("Authentication attempt failed for user: {}", dto);
         }
 
+        // get authenticated user details from the authentication result
+        UserDetails user = (UserDetails) authResult.getPrincipal();
+
+        // reset login attempts
+        userRepository.handleLoginAttempt(dto.getUsername(), true);
+        // save login history
         loginHistoryRepository.saveLoginHistory(
                 dto.getUsername(),
                 ip,

@@ -12,6 +12,8 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+
 @Log4j2
 @Repository
 @Transactional
@@ -69,5 +71,32 @@ public class UserRepository{
     public UserEntity findByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND, UserErrorCode.USER_NOT_FOUND.getMessage()));
+    }
+
+    public void handleLoginAttempt(String username, boolean isSuccessful) {
+        userRepository.findByUsername(username)
+                .ifPresent(user -> {
+                    if (!isSuccessful) {
+                        int failCount = user.getAttempt();
+                        LocalDateTime lastAttempt = user.getLastAttemptAt();
+
+                        if (lastAttempt != null && lastAttempt.plusMinutes(30).isBefore(LocalDateTime.now())) {
+                            // reset counter to 1 if last attempt was more than 30 minutes ago
+                            user.setAttempt((short) 1);
+                        } else if (failCount >= 4) {
+                            // lock account
+                            user.setIsLocked((short) 1);
+                        } else {
+                            // Not locked, increment login attempts
+                            user.setAttempt((short) (user.getAttempt() + 1));
+                        }
+                        user.setLastAttemptAt(LocalDateTime.now());
+                    } else {
+                        // reset login attempts
+                        user.setAttempt((short) 0);
+                        user.setLastAttemptAt(null);
+                    }
+                    userRepository.save(user);
+                });
     }
 }
