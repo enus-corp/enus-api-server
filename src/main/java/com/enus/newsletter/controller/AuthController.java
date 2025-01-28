@@ -11,6 +11,7 @@ import com.enus.newsletter.model.request.SigninRequest;
 import com.enus.newsletter.model.request.SignupRequest;
 import com.enus.newsletter.system.GeneralServerResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -44,8 +45,10 @@ public class AuthController {
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<GeneralServerResponse<Token>> signin(@RequestBody SigninRequest dto) {
-        Token token = authService.authenticate(dto);
+    public ResponseEntity<GeneralServerResponse<Token>> signin(HttpServletRequest request, @RequestBody SigninRequest dto) {
+        String ip = request.getHeader("X-FORWARDED-FOR");
+        ip = ip != null ? ip.split(",")[0] : request.getRemoteAddr();
+        Token token = authService.authenticate(dto, ip);
         GeneralServerResponse<Token> response = new GeneralServerResponse<Token>(
                 false,
                 "Successfully authenticated user",
