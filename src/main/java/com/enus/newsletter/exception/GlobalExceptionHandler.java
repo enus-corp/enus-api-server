@@ -44,7 +44,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.info("---------------- Exception Handler: {} ----------------", exception.getMessage());
         return ResponseEntity.ok(
                 new GeneralServerResponse<Void>(
-                        false,
+                        true,
                         exception.getMessage(),
                         exception.getErrorCode(),
                         null
