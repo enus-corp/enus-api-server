@@ -46,6 +46,7 @@ public class AuthController {
 
     @PostMapping("/signin")
     public ResponseEntity<GeneralServerResponse<Token>> signin(HttpServletRequest request, @RequestBody SigninRequest dto) {
+        log.info("\t >>> Signin Request");
         String ip = request.getHeader("X-FORWARDED-FOR");
         ip = ip != null ? ip.split(",")[0] : request.getRemoteAddr();
         Token token = authService.authenticate(dto, ip);

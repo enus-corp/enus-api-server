@@ -1,6 +1,7 @@
 package com.enus.newsletter.db.entity;
 
 import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -96,7 +97,7 @@ public class UserEntity implements UserDetails {
     private Long deletedBy = null;
 
     @ElementCollection
-    @CollectionTable(name="roles", joinColumns = @JoinColumn(name="user_id, nullable = false"))
+    @CollectionTable(name="roles", joinColumns = @JoinColumn(name="user_id", nullable = false))
     @Column(name= "role", nullable = false, length = 50)
     @Builder.Default
     private List<String> hasRole = new ArrayList<>();
