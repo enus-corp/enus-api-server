@@ -9,12 +9,13 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 
-@Log4j2
+@Slf4j(topic = "UserRepository")
 @Repository
 @Transactional
 public class UserRepository{
@@ -79,8 +80,15 @@ public class UserRepository{
                     if (!isSuccessful) {
                         int failCount = user.getAttempt();
                         LocalDateTime lastAttempt = user.getLastAttemptAt();
+                        LocalDateTime currentTime = LocalDateTime.now();
+                        short isLocked = user.getIsLocked();
 
-                        if (lastAttempt != null && lastAttempt.plusMinutes(30).isBefore(LocalDateTime.now())) {
+                        user.setLastAttemptAt(currentTime);
+                        if (isLocked == 1) {
+                            return;
+                        }
+
+                        if (lastAttempt != null && lastAttempt.plusMinutes(30).isBefore(currentTime)) {
                             // reset counter to 1 if last attempt was more than 30 minutes ago
                             user.setAttempt((short) 1);
                         } else if (failCount >= 4) {
@@ -90,7 +98,6 @@ public class UserRepository{
                             // Not locked, increment login attempts
                             user.setAttempt((short) (user.getAttempt() + 1));
                         }
-                        user.setLastAttemptAt(LocalDateTime.now());
                     } else {
                         // reset login attempts
                         user.setAttempt((short) 0);
