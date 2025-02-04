@@ -72,8 +72,11 @@ public class SecurityConfig {
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
-                .authenticationProvider(authenticationProvider)
+                // check for JWT token in the request
+                // If Token does not exits, pass to UsernamePasswordAuthenticationFilter to authenticate user principal and credential
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                // Authentication Manager delegates the authentication to the AuthenticationProvider
+                .authenticationProvider(authenticationProvider)
                 .build();
     }
 
