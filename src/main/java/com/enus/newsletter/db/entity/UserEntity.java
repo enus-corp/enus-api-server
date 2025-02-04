@@ -1,41 +1,38 @@
 package com.enus.newsletter.db.entity;
 
-import jakarta.persistence.*;
-import jakarta.transaction.Transactional;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name="users", indexes = {
         @Index(name = "idx_username", columnList = "username"),
         @Index(name = "idx_email", columnList = "email"),
 })
-@Data
-@Builder
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserEntity implements UserDetails {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false)
-    private Long id;
-
+public class UserEntity extends BaseEntity implements UserDetails {
     @Column(nullable = false)
     private String firstName;
 
@@ -53,53 +50,20 @@ public class UserEntity implements UserDetails {
     private String email;
 
     @Column(nullable = false, name = "is_expired", columnDefinition = "smallint default 0")
-    @Builder.Default
-    private short isExpired = 0;
+    private short isExpired;
 
     @Column(nullable = false, name = "is_locked", columnDefinition = "smallint default 0")
-    @Builder.Default
-    private short isLocked = 0;
+    private short isLocked;
 
     @Column(nullable = false, name = "attempt", columnDefinition = "smallint default 0 CHECK (attempt >= 0 AND attempt <= 5)")
-    @Builder.Default
-    private short attempt = 0;
+    private short attempt;
 
     @Column(nullable = true, name = "last_attempt_at")
     private LocalDateTime lastAttemptAt;
 
-    @Column(nullable = false, name = "is_deleted", columnDefinition = "smallint default 0")
-    @Builder.Default
-    private short isDeleted = 0;
-
-    @CreationTimestamp
-    @Column(updatable = false, name = "created_at")
-    @Builder.Default
-    private LocalDateTime createdAt = LocalDateTime.now();
-
-    @Column(name = "created_by")
-    private Long createdBy;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    @Builder.Default
-    private LocalDateTime updatedAt = LocalDateTime.now();
-
-    @Column(name = "updated_by")
-    @Builder.Default
-    private Long updatedBy = null;
-
-    @Column(nullable = true, name = "deleted_at")
-    @Builder.Default
-    private LocalDateTime deletedAt = null;
-
-    @Column(nullable = true, name = "deleted_by")
-    @Builder.Default
-    private Long deletedBy = null;
-
     @ElementCollection
     @CollectionTable(name="roles", joinColumns = @JoinColumn(name="user_id", nullable = false))
     @Column(name= "role", nullable = false, length = 50)
-    @Builder.Default
     private List<String> hasRole = new ArrayList<>();
 
     @Override
@@ -117,8 +81,4 @@ public class UserEntity implements UserDetails {
         return isLocked == 0;
     }
 
-    @Override
-    public boolean isEnabled() {
-        return isDeleted == 0;
-    }
 }
