@@ -1,0 +1,342 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1738764570297-1
+      author: idohyeon
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            ifNotExists: true
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_keywords
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: word
+                  type: VARCHAR(255)
+            tableName: keywords
+  - changeSet:
+      id: 1738764570297-2
+      author: idohyeon
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            ifNotExists: true
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_login_history
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_at
+                  type: DATETIME
+              - column:
+                  name: updated_at
+                  type: DATETIME
+              - column:
+                  name: deleted_at
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: username
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: ip_address
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: login_status
+                  type: INT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: reason
+                  type: VARCHAR(255)
+            tableName: login_history
+  - changeSet:
+      id: 1738764570297-3
+      author: idohyeon
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            ifNotExists: true
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_password_reset_token
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: user_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: response_code
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: email_code
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: expires_at
+                  type: DATETIME
+            tableName: password_reset_token
+  - changeSet:
+      id: 1738764570297-4
+      author: idohyeon
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            ifNotExists: true
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_roles
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: role
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: user_id
+                  type: BIGINT
+            tableName: roles
+  - changeSet:
+      id: 1738764570297-5
+      author: idohyeon
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            ifNotExists: true
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_user_keywords
+                  name: id
+                  type: INT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: user_id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: keyword_id
+                  type: BIGINT
+              - column:
+                  name: notification_enabled
+                  type: BOOLEAN
+            tableName: user_keywords
+  - changeSet:
+      id: 1738764570297-6
+      author: idohyeon
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createTable:
+            ifNotExists: true
+            columns:
+              - column:
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_users
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: created_at
+                  type: DATETIME
+              - column:
+                  name: updated_at
+                  type: DATETIME
+              - column:
+                  name: deleted_at
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: first_name
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: last_name
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: username
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: password
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: email
+                  type: VARCHAR(100)
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValueNumeric: !!float '0'
+                  name: is_expired
+                  type: smallint
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValueNumeric: !!float '0'
+                  name: is_locked
+                  type: smallint
+              - column:
+                  constraints:
+                    nullable: false
+                  defaultValueComputed: 0 CHECK (attempt >= 0 AND attempt <= 5)
+                  name: attempt
+                  type: smallint
+              - column:
+                  name: last_attempt_at
+                  type: DATETIME
+            tableName: users
+  - changeSet:
+      id: 1738764570297-7
+      author: idohyeon
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: word
+            constraintName: uc_keywords_word
+            tableName: keywords
+  - changeSet:
+      id: 1738764570297-8
+      author: idohyeon
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: user_id
+            constraintName: uc_password_reset_token_user
+            tableName: password_reset_token
+  - changeSet:
+      id: 1738764570297-9
+      author: idohyeon
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: role
+            constraintName: uc_roles_role
+            tableName: roles
+  - changeSet:
+      id: 1738764570297-10
+      author: idohyeon
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addUniqueConstraint:
+            columnNames: username
+            constraintName: uc_users_username
+            tableName: users
+  - changeSet:
+      id: 1738764570297-11
+      author: idohyeon
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: email
+            indexName: idx_email
+            tableName: users
+  - changeSet:
+      id: 1738764570297-12
+      author: idohyeon
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - createIndex:
+            columns:
+              - column:
+                  name: username
+            indexName: idx_username
+            tableName: users
+  - changeSet:
+      id: 1738764570297-13
+      author: idohyeon
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: password_reset_token
+            constraintName: FK_PASSWORD_RESET_TOKEN_ON_USER
+            referencedColumnNames: id
+            referencedTableName: users
+  - changeSet:
+      id: 1738764570297-14
+      author: idohyeon
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: roles
+            constraintName: FK_ROLES_ON_USER
+            referencedColumnNames: id
+            referencedTableName: users
+  - changeSet:
+      id: 1738764570297-15
+      author: idohyeon
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: keyword_id
+            baseTableName: user_keywords
+            constraintName: FK_USER_KEYWORDS_ON_KEYWORD
+            referencedColumnNames: id
+            referencedTableName: keywords
+  - changeSet:
+      id: 1738764570297-16
+      author: idohyeon
+      objectQuotingStrategy: QUOTE_ONLY_RESERVED_WORDS
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: user_keywords
+            constraintName: FK_USER_KEYWORDS_ON_USER
+            referencedColumnNames: id
+            referencedTableName: users
+
