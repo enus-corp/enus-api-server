@@ -1,19 +1,20 @@
 package com.enus.newsletter.db.repository;
 
+import java.time.LocalDateTime;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Repository;
+
 import com.enus.newsletter.db.entity.UserEntity;
 import com.enus.newsletter.db.repository.imp.IUserRepository;
 import com.enus.newsletter.exception.user.UserErrorCode;
 import com.enus.newsletter.exception.user.UserException;
 import com.enus.newsletter.model.request.SignupRequest;
+
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Repository;
-
-import java.time.LocalDateTime;
 
 @Slf4j(topic = "UserRepository")
 @Repository
@@ -47,13 +48,13 @@ public class UserRepository{
         try {
             log.info("Creating new user: {}", dto);
 
-            UserEntity user = UserEntity.builder()
-                    .firstName(dto.getFirstName())
-                    .lastName(dto.getLastName())
-                    .username(dto.getUsername())
-                    .password(passwordEncoder.encode(dto.getPassword()))
-                    .email(dto.getEmail())
-                    .build();
+            UserEntity user = new UserEntity(
+                    dto.getFirstName(),
+                    dto.getLastName(),
+                    dto.getUsername(),
+                    passwordEncoder.encode(dto.getPassword()),
+                    dto.getEmail()
+            );
 
             return userRepository.save(user);
 
