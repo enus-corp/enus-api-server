@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
@@ -30,16 +31,28 @@ public class SecurityConfig {
     private final AuthenticationProvider authenticationProvider;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    private final OAuth2SuccessHandler oAuth2SuccessHandler;
-    private final OAuth2FailHandler oAuth2FailHandler;
-    private final CustomOAuth2UserService customOAuth2UserService;
+//    private final OAuth2SuccessHandler oAuth2SuccessHandler;
+//    private final OAuth2FailHandler oAuth2FailHandler;
+//    private final CustomOAuth2UserService customOAuth2UserService;
 
-    public SecurityConfig(AuthenticationProvider authenticationProvider, JwtAuthenticationFilter jwtAuthenticationFilter, OAuth2SuccessHandler oAuth2SuccessHandler, OAuth2FailHandler oAuth2FailHandler, CustomOAuth2UserService customOAuth2UserService) {
+    public SecurityConfig(
+            AuthenticationProvider authenticationProvider,
+            JwtAuthenticationFilter jwtAuthenticationFilter
+//            OAuth2SuccessHandler oAuth2SuccessHandler,
+//            OAuth2FailHandler oAuth2FailHandler,
+//            CustomOAuth2UserService customOAuth2UserService
+    ) {
         this.authenticationProvider = authenticationProvider;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-        this.oAuth2SuccessHandler = oAuth2SuccessHandler;
-        this.oAuth2FailHandler = oAuth2FailHandler;
-        this.customOAuth2UserService = customOAuth2UserService;
+//        this.oAuth2SuccessHandler = oAuth2SuccessHandler;
+//        this.oAuth2FailHandler = oAuth2FailHandler;
+//        this.customOAuth2UserService = customOAuth2UserService;
+    }
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return web -> web.ignoring()
+                .requestMatchers("/error");
     }
 
     @Bean
@@ -49,12 +62,12 @@ public class SecurityConfig {
         return http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
-                .oauth2Login(config ->
-                        config
-                                .successHandler(oAuth2SuccessHandler)
-                                .failureHandler(oAuth2FailHandler)
-                                .userInfoEndpoint(userEndpointConfig -> userEndpointConfig.userService(customOAuth2UserService))
-                        )
+                // .oauth2Login(config ->
+                //         config
+                //                 .successHandler(oAuth2SuccessHandler)
+                //                 .failureHandler(oAuth2FailHandler)
+                //                 .userInfoEndpoint(userEndpointConfig -> userEndpointConfig.userService(customOAuth2UserService))
+                //         )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
@@ -73,7 +86,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 // check for JWT token in the request
-                // If Token does not exits, pass to UsernamePasswordAuthenticationFilter to authenticate user principal and credential
+                // If Token does not exists, pass to UsernamePasswordAuthenticationFilter to authenticate user principal and credential
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 // Authentication Manager delegates the authentication to the AuthenticationProvider
                 .authenticationProvider(authenticationProvider)
