@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,23 +23,32 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
-@Table(name="users", indexes = {
+@Table(name = "users", indexes = {
         @Index(name = "idx_username", columnList = "username"),
-        @Index(name = "idx_email", columnList = "email"),
+        @Index(name = "idx_email", columnList = "email")
 })
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class UserEntity extends BaseEntity implements UserDetails {
+
+    public UserEntity(
+            @NotBlank @Size(max = 50) String firstName,
+            @NotBlank @Size(max = 50) String lastName,
+            @NotBlank @Size(max = 50) String username,
+            @NotBlank @Size(max = 100) @Email String email,
+            @NotBlank @Size(max = 100) String password
+    ) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.username = username;
+        this.email = email;
+        this.password = password;
+    }
+
     @Column(nullable = false)
     private String firstName;
 
@@ -72,6 +84,7 @@ public class UserEntity extends BaseEntity implements UserDetails {
     @CollectionTable(name="roles", joinColumns = @JoinColumn(name="user_id", nullable = false))
     @Column(name= "role", nullable = false, length = 50)
     private List<String> hasRole = new ArrayList<>();
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

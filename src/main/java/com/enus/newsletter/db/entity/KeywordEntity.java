@@ -20,8 +20,7 @@ public class KeywordEntity {
     @OneToMany(mappedBy = "keyword")
     private Set<UserKeywordEntity> users;
 
-    @OneToMany(mappedBy = "keyword")
-    private Set<ArticleKeywordEntity> articles;
-
+//    @OneToMany(mappedBy = "keyword")
+//    private Set<ArticleKeywordEntity> articles;
 
 }
