@@ -33,6 +33,11 @@ public class UserRepository{
         this.userRepository = userRepository;
     }
 
+    public UserEntity findUserById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+    }
+
     public UserEntity getOne(String username) throws UserException {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
