@@ -30,8 +30,7 @@ import jakarta.validation.constraints.Email;
         @Index(name = "idx_email", columnList = "email")
 })
 @Getter
-@Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class UserEntity extends BaseEntity implements UserDetails {
 
@@ -49,13 +48,13 @@ public class UserEntity extends BaseEntity implements UserDetails {
         this.password = password;
     }
 
-    @Column(nullable = false)
+    @Column(nullable = false, length=20)
     private String firstName;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length=20)
     private String lastName;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length=20)
     private String username;
 
     @Column(nullable = false)
@@ -99,6 +98,30 @@ public class UserEntity extends BaseEntity implements UserDetails {
     @Override
     public boolean isAccountNonLocked() {
         return isLocked == 0;
+    }
+
+    public void handleLoginAttempt(boolean isSuccessful) {
+        LocalDateTime currentTime = LocalDateTime.now();
+        if (!isSuccessful) {
+            if (isLocked == 1) {
+                return;
+            }
+
+            if (lastAttemptAt != null && lastAttemptAt.plusMinutes(30).isBefore(currentTime)) {
+                // reset counter to 1 if last attempt was more than 30 minutes ago
+                attempt = 1;
+            } else if (attempt >= 4) {
+                // lock account
+                isLocked = 1;
+            } else {
+                // Not locked, increment login attempts
+                attempt++;
+            }
+        } else {
+            // reset login attempts
+            attempt = 0;
+            lastAttemptAt = null;
+        }
     }
 
 }

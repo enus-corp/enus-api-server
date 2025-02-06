@@ -78,32 +78,7 @@ public class UserRepository{
     public void handleLoginAttempt(String username, boolean isSuccessful) {
         userRepository.findByUsername(username)
                 .ifPresent(user -> {
-                    if (!isSuccessful) {
-                        int failCount = user.getAttempt();
-                        LocalDateTime lastAttempt = user.getLastAttemptAt();
-                        LocalDateTime currentTime = LocalDateTime.now();
-                        short isLocked = user.getIsLocked();
-
-                        user.setLastAttemptAt(currentTime);
-                        if (isLocked == 1) {
-                            return;
-                        }
-
-                        if (lastAttempt != null && lastAttempt.plusMinutes(30).isBefore(currentTime)) {
-                            // reset counter to 1 if last attempt was more than 30 minutes ago
-                            user.setAttempt((short) 1);
-                        } else if (failCount >= 4) {
-                            // lock account
-                            user.setIsLocked((short) 1);
-                        } else {
-                            // Not locked, increment login attempts
-                            user.setAttempt((short) (user.getAttempt() + 1));
-                        }
-                    } else {
-                        // reset login attempts
-                        user.setAttempt((short) 0);
-                        user.setLastAttemptAt(null);
-                    }
+                    user.handleLoginAttempt(isSuccessful);
                     userRepository.save(user);
                 });
     }
