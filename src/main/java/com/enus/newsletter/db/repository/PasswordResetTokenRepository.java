@@ -37,7 +37,7 @@ public class PasswordResetTokenRepository {
                 .orElseThrow(() -> new UserException(UserErrorCode.INVALID_RESET_PASSWORD_TOKEN));
 
         UserEntity user = resetToken.getUser();
-        user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        user.resetPassword(passwordEncoder.encode(dto.getNewPassword()));
         userRepository.save(user);
         passwordResetTokenRepository.delete(resetToken);
     }

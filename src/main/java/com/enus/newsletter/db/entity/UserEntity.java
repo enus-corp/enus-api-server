@@ -124,4 +124,8 @@ public class UserEntity extends BaseEntity implements UserDetails {
         }
     }
 
+    public void resetPassword(String newPassword) {
+        this.password = newPassword;
+    }
+
 }
