@@ -1,15 +1,18 @@
 package com.enus.newsletter.db.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 
 import java.util.Set;
 
 @Entity
-@Table(name="keywords")
-@Data
-public class KeywordEntity {
+@Table(name="Keyword")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class KeywordEntity extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

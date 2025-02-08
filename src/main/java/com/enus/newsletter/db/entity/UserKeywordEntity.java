@@ -4,9 +4,9 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
-@Table(name="user_keywords")
+@Table(name="UserKeywords")
 @Data
-public class UserKeywordEntity {
+public class UserKeywordEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;

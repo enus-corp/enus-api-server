@@ -21,18 +21,14 @@ import lombok.Getter;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false)
-    private Long id;
-
     @JsonIgnore
     @CreationTimestamp
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false, updatable = false, name = "created_at")
     private LocalDateTime createdAt;
 
     @JsonIgnore
     @UpdateTimestamp
+    @Column(nullable = false, name = "updated_at")
     private LocalDateTime updatedAt;
 
     @JsonIgnore
