@@ -2,6 +2,7 @@ package com.enus.newsletter.db.repository;
 
 import java.time.LocalDateTime;
 
+import com.enus.newsletter.db.AbsBaseRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
@@ -19,35 +20,33 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j(topic = "UserRepository")
 @Repository
 @Transactional
-public class UserRepository{
+public class UserRepository extends AbsBaseRepository<UserEntity, IUserRepository> {
 
     private final PasswordEncoder passwordEncoder;
-
-    private final IUserRepository userRepository;
 
     @PersistenceContext
     private EntityManager em;
 
     public UserRepository(PasswordEncoder passwordEncoder, IUserRepository userRepository) {
+        super(userRepository);
         this.passwordEncoder = passwordEncoder;
-        this.userRepository = userRepository;
     }
 
     public UserEntity findUserById(Long id) {
-        return userRepository.findById(id)
+        return repository.findById(id)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
     }
 
     public UserEntity getOne(String username) throws UserException {
-        return userRepository.findByUsername(username)
+        return repository.findByUsername(username)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
     }
 
     public UserEntity createUser(SignupRequest dto) throws UserException {
-        if (userRepository.existsByUsername(dto.getUsername())) {
+        if (repository.existsByUsername(dto.getUsername())) {
             throw new UserException(UserErrorCode.USER_EXISTS, UserErrorCode.USER_EXISTS.getMessage());
         }
-        if (userRepository.existsByEmail(dto.getEmail())) {
+        if (repository.existsByEmail(dto.getEmail())) {
             throw new UserException(UserErrorCode.USER_EXISTS, UserErrorCode.USER_EXISTS.getMessage());
         }
         try {
@@ -61,7 +60,7 @@ public class UserRepository{
                     dto.getEmail()
             );
 
-            return userRepository.save(user);
+            return repository.save(user);
 
         } catch (Exception e) {
             log.error("Failed to create user: {}", dto.getUsername(), e);
@@ -70,21 +69,21 @@ public class UserRepository{
     }
 
     public UserEntity verifyEmail(String email) throws UserException {
-        UserEntity user = userRepository.findByEmail(email)
+        UserEntity user = repository.findByEmail(email)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
-        return userRepository.save(user);
+        return repository.save(user);
     }
 
     public UserEntity findByUsername(String username) {
-        return userRepository.findByUsername(username)
+        return repository.findByUsername(username)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND, UserErrorCode.USER_NOT_FOUND.getMessage()));
     }
 
     public void handleLoginAttempt(String username, boolean isSuccessful) {
-        userRepository.findByUsername(username)
+        repository.findByUsername(username)
                 .ifPresent(user -> {
                     user.handleLoginAttempt(isSuccessful);
-                    userRepository.save(user);
+                    repository.save(user);
                 });
     }
 }

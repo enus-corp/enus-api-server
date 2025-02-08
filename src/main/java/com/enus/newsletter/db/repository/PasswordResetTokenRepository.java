@@ -1,5 +1,6 @@
 package com.enus.newsletter.db.repository;
 
+import com.enus.newsletter.db.AbsBaseRepository;
 import com.enus.newsletter.db.entity.PasswordResetToken;
 import com.enus.newsletter.db.entity.UserEntity;
 import com.enus.newsletter.db.repository.imp.IPasswordResetTokenRepository;
@@ -17,19 +18,18 @@ import java.time.LocalDateTime;
 @Log4j2
 @Repository
 @Transactional
-public class PasswordResetTokenRepository {
+public class PasswordResetTokenRepository extends AbsBaseRepository<PasswordResetToken, IPasswordResetTokenRepository> {
     private final PasswordEncoder passwordEncoder;
     private final IUserRepository userRepository;
-    private final IPasswordResetTokenRepository passwordResetTokenRepository;
 
     public PasswordResetTokenRepository(PasswordEncoder passwordEncoder, IUserRepository userRepository, IPasswordResetTokenRepository passwordResetTokenRepository) {
+        super(passwordResetTokenRepository);
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
-        this.passwordResetTokenRepository = passwordResetTokenRepository;
     }
 
     public void resetPassword(ResetPasswordRequest dto) throws UserException {
-        PasswordResetToken resetToken = passwordResetTokenRepository.findValidTokenByEmailCode(
+        PasswordResetToken resetToken = repository.findValidTokenByEmailCode(
                 dto.getVerificationCode(),
                 dto.getEmailCode(),
                 LocalDateTime.now()
@@ -39,6 +39,6 @@ public class PasswordResetTokenRepository {
         UserEntity user = resetToken.getUser();
         user.resetPassword(passwordEncoder.encode(dto.getNewPassword()));
         userRepository.save(user);
-        passwordResetTokenRepository.delete(resetToken);
+        repository.delete(resetToken);
     }
 }

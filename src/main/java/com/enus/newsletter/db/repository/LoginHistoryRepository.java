@@ -1,5 +1,6 @@
 package com.enus.newsletter.db.repository;
 
+import com.enus.newsletter.db.AbsBaseRepository;
 import com.enus.newsletter.db.entity.LoginHistoryEntity;
 import com.enus.newsletter.db.repository.imp.ILoginHistoryRepository;
 import jakarta.transaction.Transactional;
@@ -9,11 +10,10 @@ import org.springframework.stereotype.Repository;
 @Log4j2
 @Repository
 @Transactional
-public class LoginHistoryRepository {
-    private final ILoginHistoryRepository loginHistoryRepository;
+public class LoginHistoryRepository extends AbsBaseRepository<LoginHistoryEntity, ILoginHistoryRepository> {
 
     public LoginHistoryRepository(ILoginHistoryRepository loginHistoryRepository) {
-        this.loginHistoryRepository = loginHistoryRepository;
+        super(loginHistoryRepository);
     }
 
     public void saveLoginHistory(String username, String ipAddress, int status, String reason) {
@@ -26,6 +26,6 @@ public class LoginHistoryRepository {
                 .reason(reason)
                 .build();
 
-        loginHistoryRepository.save(loginHistory);
+        repository.save(loginHistory);
     }
 }
