@@ -1,5 +1,6 @@
 package com.enus.newsletter.controller;
 
+import com.enus.newsletter.db.entity.KeywordEntity;
 import com.enus.newsletter.model.request.SaveKeywordEntity;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;

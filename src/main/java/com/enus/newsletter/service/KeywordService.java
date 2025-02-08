@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j(topic = "KEYWORD_SERVICE")
-public class KeywordService {
+public class KeywordService{
 
     private final UserRepository userRepository;
     private final KeywordRepository keywordRepository;
@@ -25,7 +25,7 @@ public class KeywordService {
         this.keywordRepository = keywordRepository;
     }
 
-    public void addKeyword(SaveKeywordEntity req) {
+    public List<String> addKeyword(SaveKeywordEntity req) {
         log.info("Adding keywords for user with id: {}", req.getUserId());
 
         // get user. throw exception if not found
@@ -42,13 +42,16 @@ public class KeywordService {
         // remove existing keywords from new keywords
         newKeywords.removeAll(existingKeywords);
 
-//        List<KeywordEntity> keywords = newKeywords.stream()
-//                .map(word -> {
-//                    KeywordEntity keyword = new KeywordEntity();
-//                    keyword.setWord(word);
-//                    return keywordRepository.save(keyword);
-//                })
-//                .collect(Collectors.toList());
+        List<KeywordEntity> keywords = newKeywords.stream()
+                .map(word -> {
+                    KeywordEntity keyword = new KeywordEntity();
+                    keyword.setWord(word);
+                    return keywordRepository.save(keyword);
+                })
+                .toList();
+
+        return keywords.stream().map(KeywordEntity::getWord).toList();
+
     }
 
     public void getUserKeywords(Long userId) {
