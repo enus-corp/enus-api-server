@@ -17,9 +17,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.enus.newsletter.filter.JwtAuthenticationFilter;
-import com.enus.newsletter.handler.OAuth2FailHandler;
-import com.enus.newsletter.handler.OAuth2SuccessHandler;
-import com.enus.newsletter.service.CustomOAuth2UserService;
 
 import lombok.extern.log4j.Log4j2;
 
