@@ -1,15 +1,17 @@
 package com.enus.newsletter.service;
 
-import java.util.Optional;
-
-import org.springframework.stereotype.Service;
-
 import com.enus.newsletter.db.entity.KeywordEntity;
 import com.enus.newsletter.db.entity.UserEntity;
+import org.springframework.stereotype.Service;
+
 import com.enus.newsletter.db.repository.KeywordRepository;
 import com.enus.newsletter.db.repository.UserRepository;
+import com.enus.newsletter.model.request.SaveKeywordEntity;
 
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j(topic = "KEYWORD_SERVICE")
@@ -23,12 +25,30 @@ public class KeywordService {
         this.keywordRepository = keywordRepository;
     }
 
-    public void addKeyword(Long userId, String word) {
-        log.info("Adding keyword: {} for user with id: {}", word, userId);
-        UserEntity user = userRepository.findUserById(userId);
-        Optional<KeywordEntity> keyword = keywordRepository.findByWord(word);
-                // .orElseGet(() -> keywordRepository.save(new KeywordEntity(word)));
+    public void addKeyword(SaveKeywordEntity req) {
+        log.info("Adding keywords for user with id: {}", req.getUserId());
 
+        // get user. throw exception if not found
+        UserEntity user = userRepository.findUserById(req.getUserId());
+
+        Set<String> newKeywords = new HashSet<>(Arrays.asList(req.getKeywords()));
+
+         // SELECT * FROM keyword_entity WHERE word IN (newKeywords)
+        Set<String> existingKeywords = keywordRepository.findByWordIn(newKeywords)
+                .stream()
+                .map(KeywordEntity::getWord)
+                .collect(Collectors.toSet());
+
+        // remove existing keywords from new keywords
+        newKeywords.removeAll(existingKeywords);
+
+//        List<KeywordEntity> keywords = newKeywords.stream()
+//                .map(word -> {
+//                    KeywordEntity keyword = new KeywordEntity();
+//                    keyword.setWord(word);
+//                    return keywordRepository.save(keyword);
+//                })
+//                .collect(Collectors.toList());
     }
 
     public void getUserKeywords(Long userId) {

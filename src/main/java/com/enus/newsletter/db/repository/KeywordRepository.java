@@ -1,6 +1,8 @@
 package com.enus.newsletter.db.repository;
 
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Stream;
 
 import org.springframework.stereotype.Repository;
 
@@ -22,5 +24,9 @@ public class KeywordRepository {
 
     public Optional<KeywordEntity> findByWord(String word) {
         return keywordRepository.findByWord(word);
+    }
+
+    public Set<KeywordEntity> findByWordIn(Iterable<String> words) {
+        return keywordRepository.findByWordIn(words);
     }
 }

@@ -1,7 +1,8 @@
 package com.enus.newsletter.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.enus.newsletter.model.request.SaveKeywordEntity;
+import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.*;
 
 import com.enus.newsletter.service.KeywordService;
 import com.enus.newsletter.system.GeneralServerResponse;
@@ -10,8 +11,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 
 
 @Tag(name="Keyword", description = "Keyword")
@@ -25,13 +24,23 @@ public class KeywordController {
         this.keywordService = keywordService;
     }
 
-    @GetMapping("/{userId}/keywords")
-    public ResponseEntity<GeneralServerResponse<Void>> getMethodName(@PathVariable("userId") Long userId) {
+    @GetMapping("getKeywords/{userId}")
+    public ResponseEntity<GeneralServerResponse<Void>> getKeywords(@PathVariable("userId") Long userId) {
         keywordService.getUserKeywords(userId);
         return ResponseEntity.ok(new GeneralServerResponse<>(
             false, 
             "Successfully returned registerd keywords", 
             0, 
+            null));
+    }
+
+    @PostMapping("addKeywords")
+    public ResponseEntity<GeneralServerResponse<Void>> saveKeywords(@Valid @RequestBody SaveKeywordEntity req) {
+        keywordService.addKeyword(req);
+        return ResponseEntity.ok(new GeneralServerResponse<>(
+            false,
+            "Successfully saved keywords",
+            0,
             null));
     }
     
