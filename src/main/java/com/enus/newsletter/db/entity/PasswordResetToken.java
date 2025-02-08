@@ -1,16 +1,14 @@
 package com.enus.newsletter.db.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "password_reset_token")
-@Data
+@Table(name = "PasswordResetToken")
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class PasswordResetToken {
@@ -22,12 +20,12 @@ public class PasswordResetToken {
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "response_code")
     private String responseCode;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "email_code")
     private String emailCode;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "expires_at")
     private LocalDateTime expiresAt;
 }
