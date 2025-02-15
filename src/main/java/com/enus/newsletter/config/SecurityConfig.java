@@ -24,26 +24,15 @@ import lombok.extern.log4j.Log4j2;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
     private final AuthenticationProvider authenticationProvider;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-
-//    private final OAuth2SuccessHandler oAuth2SuccessHandler;
-//    private final OAuth2FailHandler oAuth2FailHandler;
-//    private final CustomOAuth2UserService customOAuth2UserService;
 
     public SecurityConfig(
             AuthenticationProvider authenticationProvider,
             JwtAuthenticationFilter jwtAuthenticationFilter
-//            OAuth2SuccessHandler oAuth2SuccessHandler,
-//            OAuth2FailHandler oAuth2FailHandler,
-//            CustomOAuth2UserService customOAuth2UserService
     ) {
         this.authenticationProvider = authenticationProvider;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-//        this.oAuth2SuccessHandler = oAuth2SuccessHandler;
-//        this.oAuth2FailHandler = oAuth2FailHandler;
-//        this.customOAuth2UserService = customOAuth2UserService;
     }
 
     @Bean

@@ -12,6 +12,7 @@ import com.enus.newsletter.db.repository.UserRepository;
 import com.enus.newsletter.exception.auth.AuthErrorCode;
 import com.enus.newsletter.exception.auth.AuthException;
 import com.enus.newsletter.exception.user.UserException;
+import com.enus.newsletter.model.dto.UserDTO;
 import com.enus.newsletter.model.request.ResetPasswordRequest;
 import com.enus.newsletter.model.request.SigninRequest;
 import com.enus.newsletter.model.request.SignupRequest;
@@ -149,10 +150,11 @@ public class AuthService {
         if (username == null) {
             throw new AuthException(AuthErrorCode.INVALID_TOKEN, AuthErrorCode.INVALID_TOKEN.getMessage());
         }
-        UserDetails user = userRepository.findByUsername(username);
+        UserEntity user = userRepository.findByUsername(username);
+        UserDTO userDTO = new UserDTO(user);
 
-        if (jwtService.isTokenValid(refreshToken, user)) {
-            String accessToken = jwtService.generateAccessToken(user);
+        if (jwtService.isTokenValid(refreshToken, userDTO)) {
+            String accessToken = jwtService.generateAccessToken(userDTO);
 
             return Token
                     .builder()

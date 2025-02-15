@@ -25,7 +25,7 @@ import jakarta.validation.constraints.Email;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class UserEntity extends BaseEntity implements UserDetails {
+public class UserEntity extends BaseEntity {
 
     public UserEntity(
             @NotBlank @Size(max = 50) String firstName,
@@ -44,7 +44,6 @@ public class UserEntity extends BaseEntity implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
     private Long id;
-
 
     @Column(nullable = false, length=20, name = "first_name")
     private String firstName;
@@ -81,22 +80,6 @@ public class UserEntity extends BaseEntity implements UserDetails {
     @CollectionTable(name="roles", joinColumns = @JoinColumn(name="user_id", nullable = false))
     @Column(name= "role", nullable = false, length = 50)
     private List<String> hasRole = new ArrayList<>();
-
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return hasRole.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return isExpired == 0;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return isLocked == 0;
-    }
 
     public void handleLoginAttempt(boolean isSuccessful) {
         LocalDateTime currentTime = LocalDateTime.now();

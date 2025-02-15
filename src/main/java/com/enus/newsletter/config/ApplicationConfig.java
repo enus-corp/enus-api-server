@@ -1,5 +1,6 @@
 package com.enus.newsletter.config;
 
+import com.enus.newsletter.model.dto.UserDTO;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,7 +29,7 @@ public class ApplicationConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> userRepository.findByUsername(username)
+        return username -> userRepository.findByUsername(username).map(UserDTO::new)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
