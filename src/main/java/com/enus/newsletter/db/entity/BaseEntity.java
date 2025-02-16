@@ -28,7 +28,7 @@ public abstract class BaseEntity {
 
     @JsonIgnore
     @UpdateTimestamp
-    @Column(nullable = false, name = "updated_at")
+    @Column(nullable = true, name = "updated_at")
     private LocalDateTime updatedAt;
 
     @JsonIgnore

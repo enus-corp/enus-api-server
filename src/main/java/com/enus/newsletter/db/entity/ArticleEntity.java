@@ -18,14 +18,14 @@ public class ArticleEntity extends BaseEntity{
     @Column(nullable = false, name = "article_id")
     private String articleId;
 
-    @Column(nullable = false, name = "media_name")
-    private String mediaName;
-
     @Column(nullable = false, name = "media_code")
     private String mediaCode;
 
     @Column(nullable = false)
     private String title;
+
+    @Column(nullable = false, name = "summary", columnDefinition = "TEXT")
+    private String summary;
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
