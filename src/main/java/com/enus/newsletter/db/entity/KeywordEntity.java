@@ -7,7 +7,7 @@ import lombok.*;
 import java.util.Set;
 
 @Entity
-@Table(name="Keyword")
+@Table(name="keywords")
 @Getter
 @Setter
 @NoArgsConstructor

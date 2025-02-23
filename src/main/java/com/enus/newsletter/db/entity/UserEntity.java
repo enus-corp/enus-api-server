@@ -2,23 +2,18 @@ package com.enus.newsletter.db.entity;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import jakarta.validation.constraints.Email;
 
 @Entity
-@Table(name = "User", indexes = {
+@Table(name = "users", indexes = {
         @Index(name = "idx_username", columnList = "username"),
         @Index(name = "idx_email", columnList = "email")
 })
@@ -31,8 +26,8 @@ public class UserEntity extends BaseEntity {
             @NotBlank @Size(max = 50) String firstName,
             @NotBlank @Size(max = 50) String lastName,
             @NotBlank @Size(max = 50) String username,
-            @NotBlank @Size(max = 100) @Email String email,
-            @NotBlank @Size(max = 100) String password
+            @NotBlank @Size(max = 100) String password,
+            @NotBlank @Size(max = 100) @Email String email
     ) {
         this.firstName = firstName;
         this.lastName = lastName;

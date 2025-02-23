@@ -41,7 +41,6 @@ public class AuthController {
 
       log.info("---------------- Signup response: {} ----------------", response);
       return ResponseEntity.ok(response);
-
     }
 
     @PostMapping("/signin")
