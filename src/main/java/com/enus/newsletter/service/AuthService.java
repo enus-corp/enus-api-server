@@ -90,7 +90,8 @@ public class AuthService {
             );
 
             throw new AuthException(AuthErrorCode.ACCOUNT_DISABLED, "Authentication failed. Account is disabled");
-        } catch (AuthenticationException e) {
+        } catch (Exception e) {
+            log.error("Authentication failed for user: {}", e.getMessage());
             userRepository.handleLoginAttempt(dto.getUsername(), false);
 
             loginHistoryRepository.saveLoginHistory(

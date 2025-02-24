@@ -2,6 +2,7 @@ package com.enus.newsletter.db.entity;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -11,6 +12,8 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import jakarta.validation.constraints.Email;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
 @Table(name = "users", indexes = {
@@ -71,10 +74,10 @@ public class UserEntity extends BaseEntity {
     @Column(nullable = true, name = "last_attempt_at")
     private LocalDateTime lastAttemptAt;
 
-    @ElementCollection
-    @CollectionTable(name="roles", joinColumns = @JoinColumn(name="user_id", nullable = false))
-    @Column(name= "role", nullable = false, length = 50)
-    private List<String> hasRole = new ArrayList<>();
+//    @ElementCollection
+//    @CollectionTable(name="roles", joinColumns = @JoinColumn(name="user_id", nullable = false))
+//    @Column(name= "role", nullable = false, length = 50)
+//    private List<String> hasRole = new ArrayList<>();
 
     public void handleLoginAttempt(boolean isSuccessful) {
         LocalDateTime currentTime = LocalDateTime.now();
