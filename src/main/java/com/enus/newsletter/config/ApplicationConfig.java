@@ -1,6 +1,7 @@
 package com.enus.newsletter.config;
 
 import com.enus.newsletter.model.dto.UserDTO;
+import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,8 +30,13 @@ public class ApplicationConfig {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> userRepository.findByUsername(username).map(UserDTO::new)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return username -> {
+            return userRepository.findByUsername(username)
+                    .map(UserDTO::new)
+                    .orElseThrow(() -> {
+                        return new UsernameNotFoundException("User not found");
+                    });
+        };
     }
 
     @Bean
@@ -42,7 +48,20 @@ public class ApplicationConfig {
     }
 
     @Bean
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsService());
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
+    }
+
+    @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public ModelMapper modelMapper() {
+        return new ModelMapper();
     }
 }
