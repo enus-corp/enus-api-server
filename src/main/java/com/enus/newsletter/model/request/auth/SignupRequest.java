@@ -1,4 +1,4 @@
-package com.enus.newsletter.model.request;
+package com.enus.newsletter.model.request.auth;
 
 
 import jakarta.validation.constraints.Email;
@@ -7,8 +7,6 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Data;
-
-import java.util.List;
 
 @Builder
 @Data

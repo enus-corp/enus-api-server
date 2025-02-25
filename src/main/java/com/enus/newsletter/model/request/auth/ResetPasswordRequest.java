@@ -1,4 +1,4 @@
-package com.enus.newsletter.model.request;
+package com.enus.newsletter.model.request.auth;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

@@ -1,4 +1,4 @@
-package com.enus.newsletter.model.request;
+package com.enus.newsletter.model.request.auth;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
