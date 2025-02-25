@@ -2,11 +2,18 @@ package com.enus.newsletter.service;
 
 import com.enus.newsletter.db.entity.KeywordEntity;
 import com.enus.newsletter.db.entity.UserEntity;
+import com.enus.newsletter.db.entity.UserKeywordEntity;
+import com.enus.newsletter.db.repository.imp.IUserKeywordRepository;
+import com.enus.newsletter.exception.keyword.KeywordErrorCode;
+import com.enus.newsletter.exception.keyword.KeywordException;
+import com.enus.newsletter.model.dto.KeywordDTO;
+import com.enus.newsletter.model.dto.UserDTO;
+import com.enus.newsletter.model.request.keyword.KeywordRequest;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import com.enus.newsletter.db.repository.KeywordRepository;
 import com.enus.newsletter.db.repository.UserRepository;
-import com.enus.newsletter.model.request.SaveKeywordEntity;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,41 +24,45 @@ import java.util.stream.Collectors;
 @Slf4j(topic = "KEYWORD_SERVICE")
 public class KeywordService{
 
+    private final IUserKeywordRepository userKeywordRepository;
     private final UserRepository userRepository;
     private final KeywordRepository keywordRepository;
 
-    public KeywordService(UserRepository userRepository, KeywordRepository keywordRepository) {
+    public KeywordService(IUserKeywordRepository userKeywordRepository, UserRepository userRepository, KeywordRepository keywordRepository) {
+        this.userKeywordRepository = userKeywordRepository;
         this.userRepository = userRepository;
         this.keywordRepository = keywordRepository;
     }
 
-    public List<String> addKeyword(SaveKeywordEntity req) {
-        log.info("Adding keywords for user with id: {}", req.getUserId());
+    @Transactional
+    public KeywordDTO addKeywordToUser(Long userId, KeywordRequest req) {
+        log.info("Adding Keyword for user : {}", userId);
 
-        // get user. throw exception if not found
-        UserEntity user = userRepository.findUserById(req.getUserId());
+        UserEntity user = userRepository.findUserById(userId);
 
-        Set<String> newKeywords = new HashSet<>(Arrays.asList(req.getKeywords()));
+        KeywordEntity keyword = keywordRepository.findByWord(req.getWord())
+                .orElseGet(() -> {
+                    KeywordEntity newKeyword = new KeywordEntity();
+                    newKeyword.setWord(req.getWord());
+                    return keywordRepository.save(newKeyword);
+                });
 
-         // SELECT * FROM keyword_entity WHERE word IN (newKeywords)
-        Set<String> existingKeywords = keywordRepository.findByWordIn(newKeywords)
-                .stream()
-                .map(KeywordEntity::getWord)
-                .collect(Collectors.toSet());
+        if (userKeywordRepository.existsByUserAndKeyword(user, keyword)) {
+            log.info("Keyword already exists for user");
+            throw new KeywordException(KeywordErrorCode.KEYWORD_ALREADY_EXISTS, KeywordErrorCode.KEYWORD_ALREADY_EXISTS.getMessage());
+        }
 
-        // remove existing keywords from new keywords
-        newKeywords.removeAll(existingKeywords);
+        UserKeywordEntity userKeyword  = new UserKeywordEntity();
+        userKeyword.setUser(user);
+        userKeyword.setKeyword(keyword);
+        userKeyword.setNotificationEnabled(req.isNotificationEnabled());
+        userKeywordRepository.save(userKeyword);
 
-        List<KeywordEntity> keywords = newKeywords.stream()
-                .map(word -> {
-                    KeywordEntity keyword = new KeywordEntity();
-                    keyword.setWord(word);
-                    return keywordRepository.save(keyword);
-                })
-                .toList();
-
-        return keywords.stream().map(KeywordEntity::getWord).toList();
-
+        return KeywordDTO.builder()
+                .id(keyword.getId())
+                .word(keyword.getWord())
+                .notificationEnabled(req.isNotificationEnabled())
+                .build();
     }
 
     public void getUserKeywords(Long userId) {
