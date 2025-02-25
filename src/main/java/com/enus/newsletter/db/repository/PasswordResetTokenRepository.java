@@ -7,7 +7,7 @@ import com.enus.newsletter.db.repository.imp.IPasswordResetTokenRepository;
 import com.enus.newsletter.db.repository.imp.IUserRepository;
 import com.enus.newsletter.exception.user.UserErrorCode;
 import com.enus.newsletter.exception.user.UserException;
-import com.enus.newsletter.model.request.ResetPasswordRequest;
+import com.enus.newsletter.model.request.auth.ResetPasswordRequest;
 import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.crypto.password.PasswordEncoder;
