@@ -63,12 +63,13 @@ public class SecurityConfig {
                                 // Authentication
                                 "/api/auth/signup",
                                 "/api/auth/signin",
-                                "/api/auth/refreshToken",
+                                "/api/auth/refresh",
                                 "/api/auth/verifyEmail",
                                 "/api/auth/resetPassword",
                                 // Error
                                 "/error"
                         ).permitAll()
+                        .requestMatchers("/api/keyword/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 // check for JWT token in the request
