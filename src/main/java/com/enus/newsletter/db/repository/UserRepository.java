@@ -1,7 +1,5 @@
 package com.enus.newsletter.db.repository;
 
-import java.time.LocalDateTime;
-
 import com.enus.newsletter.db.AbsBaseRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
@@ -10,7 +8,7 @@ import com.enus.newsletter.db.entity.UserEntity;
 import com.enus.newsletter.db.repository.imp.IUserRepository;
 import com.enus.newsletter.exception.user.UserErrorCode;
 import com.enus.newsletter.exception.user.UserException;
-import com.enus.newsletter.model.request.SignupRequest;
+import com.enus.newsletter.model.request.auth.SignupRequest;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
