@@ -14,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class UserDTO implements UserDetails {
+    private final Long userId;
     private final String firstName;
     private final String lastName;
     private final String username;
@@ -22,13 +23,13 @@ public class UserDTO implements UserDetails {
 //    private final Collection<? extends GrantedAuthority> authorities;
 
     public UserDTO(UserEntity user) {
+        this.userId = user.getId();
         this.firstName = user.getFirstName();
         this.lastName = user.getLastName();
         this.username = user.getUsername();
         this.password = user.getPassword();
         this.email = user.getEmail();
 
-        System.out.println("Password -> " + this.password);
 //        this.authorities = user.getHasRole().stream()
 //                .map(role -> (GrantedAuthority) () -> role)
 //                .collect(Collectors.toList());
