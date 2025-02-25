@@ -2,13 +2,14 @@ package com.enus.newsletter.controller;
 
 
 import com.enus.newsletter.db.entity.UserEntity;
-import com.enus.newsletter.model.request.ResetPasswordRequest;
-import com.enus.newsletter.model.request.VerifyViaEmailRequest;
+import com.enus.newsletter.model.request.auth.ResetPasswordRequest;
+import com.enus.newsletter.model.request.auth.SigninRequest;
+import com.enus.newsletter.model.request.auth.SignupRequest;
+import com.enus.newsletter.model.request.auth.VerifyViaEmailRequest;
+import com.enus.newsletter.model.request.keyword.RefreshTokenRequest;
 import com.enus.newsletter.model.response.Token;
 import com.enus.newsletter.model.response.VerifyViaEmail;
 import com.enus.newsletter.service.AuthService;
-import com.enus.newsletter.model.request.SigninRequest;
-import com.enus.newsletter.model.request.SignupRequest;
 import com.enus.newsletter.system.GeneralServerResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -90,8 +91,8 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<GeneralServerResponse<Token>> refresh(@RequestBody String refreshToken) {
-        Token token = authService.refreshToken(refreshToken);
+    public ResponseEntity<GeneralServerResponse<Token>> refresh(@Valid @RequestBody RefreshTokenRequest dto) {
+        Token token = authService.refreshToken(dto);
         GeneralServerResponse<Token> response = new GeneralServerResponse<Token>(
                 false,
                 "Successfully refreshed new token",

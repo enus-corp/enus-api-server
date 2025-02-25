@@ -13,24 +13,22 @@ import com.enus.newsletter.exception.auth.AuthErrorCode;
 import com.enus.newsletter.exception.auth.AuthException;
 import com.enus.newsletter.exception.user.UserException;
 import com.enus.newsletter.model.dto.UserDTO;
-import com.enus.newsletter.model.request.ResetPasswordRequest;
-import com.enus.newsletter.model.request.SigninRequest;
-import com.enus.newsletter.model.request.SignupRequest;
-import com.enus.newsletter.model.request.VerifyViaEmailRequest;
+import com.enus.newsletter.model.request.auth.ResetPasswordRequest;
+import com.enus.newsletter.model.request.auth.SigninRequest;
+import com.enus.newsletter.model.request.auth.SignupRequest;
+import com.enus.newsletter.model.request.auth.VerifyViaEmailRequest;
+import com.enus.newsletter.model.request.keyword.RefreshTokenRequest;
 import com.enus.newsletter.model.response.Token;
 import com.enus.newsletter.model.response.VerifyViaEmail;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.Random;
 
 @Slf4j(topic = "AUTH_SERVICE")
@@ -146,28 +144,26 @@ public class AuthService {
 
     }
 
-    public Token refreshToken(String refreshToken) throws UserException, AuthException {
-        String username = jwtService.extractUsername(refreshToken);
+    public Token refreshToken(RefreshTokenRequest dto) throws UserException, AuthException {
+        String username = jwtService.extractUsername(dto.getRefreshToken());
         if (username == null) {
             throw new AuthException(AuthErrorCode.INVALID_TOKEN, AuthErrorCode.INVALID_TOKEN.getMessage());
         }
         UserEntity user = userRepository.findByUsername(username);
         UserDTO userDTO = new UserDTO(user);
 
-        if (jwtService.isTokenValid(refreshToken, userDTO)) {
+        if (jwtService.isTokenValid(dto.getRefreshToken(), userDTO)) {
             String accessToken = jwtService.generateAccessToken(userDTO);
 
             return Token
                     .builder()
                     .accessToken(accessToken)
-                    .refreshToken(refreshToken)
+                    .refreshToken(dto.getRefreshToken())
                     .build();
         } else {
             throw new AuthException(AuthErrorCode.INVALID_TOKEN, "Invalid token");
         }
     }
-
-
 
     private String generateVerificationCode() {
         return String.format("%06d", new Random().nextInt(999999));
