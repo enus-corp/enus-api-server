@@ -16,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.ResponseEntity;
 
+import java.util.List;
+
 
 @Tag(name="Keyword", description = "Keyword")
 @RestController
@@ -38,16 +40,20 @@ public class KeywordController {
             null));
     }
 
-    @PostMapping("addKeywords")
-    public ResponseEntity<GeneralServerResponse<Void>> addKeywordsInBatch(@Valid @RequestBody BatchKeywordRequest keywords) {
+    @PostMapping("batchAdd")
+    public ResponseEntity<GeneralServerResponse<List<KeywordDTO>>> addKeywordsInBatch(
+            @AuthenticationPrincipal UserDTO currentUser,
+            @Valid @RequestBody BatchKeywordRequest req) {
+        log.info("[KeywordController][Add Batch] Adding new keywords in batch");
+        List<KeywordDTO> keywords = keywordService.addKeywordsInBatch(currentUser.getUserId(), req.getKeywords());
         return ResponseEntity.ok(new GeneralServerResponse<>(
                 false,
                 "Successfully saved keywords",
                 0,
-                null));
+                keywords));
     }
 
-    @PostMapping("addKeyword")
+    @PostMapping("add")
     public ResponseEntity<GeneralServerResponse<KeywordDTO>> addKeyword(
             @AuthenticationPrincipal UserDTO currentUser,
             @Valid @RequestBody KeywordRequest req) {

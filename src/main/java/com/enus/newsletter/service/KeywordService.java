@@ -8,6 +8,7 @@ import com.enus.newsletter.exception.keyword.KeywordErrorCode;
 import com.enus.newsletter.exception.keyword.KeywordException;
 import com.enus.newsletter.model.dto.KeywordDTO;
 import com.enus.newsletter.model.dto.UserDTO;
+import com.enus.newsletter.model.request.keyword.BatchKeywordRequest;
 import com.enus.newsletter.model.request.keyword.KeywordRequest;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -63,6 +64,39 @@ public class KeywordService{
                 .word(keyword.getWord())
                 .notificationEnabled(req.isNotificationEnabled())
                 .build();
+    }
+
+    @Transactional
+    public List<KeywordDTO> addKeywordsInBatch(Long userId, List<KeywordRequest> keywords) {
+        log.info("Adding Keywords in batch for user : {}", userId);
+
+        UserEntity user = userRepository.findUserById(userId);
+
+        return keywords.stream()
+                .map(k -> {
+                    KeywordEntity keyword = keywordRepository.findByWord(k.getWord())
+                            .orElseGet(() -> {
+                                KeywordEntity newKeyword = new KeywordEntity();
+                                newKeyword.setWord(k.getWord());
+                                return keywordRepository.save(newKeyword);
+                            });
+
+                    // skip if user already has the keyword
+                    if (!userKeywordRepository.existsByUserAndKeyword(user, keyword)) {
+                        UserKeywordEntity userKeyword = new UserKeywordEntity();
+                        userKeyword.setUser(user);
+                        userKeyword.setKeyword(keyword);
+                        userKeyword.setNotificationEnabled(k.isNotificationEnabled());
+                        userKeywordRepository.save(userKeyword);
+                    }
+
+                    return KeywordDTO
+                            .builder()
+                            .id(keyword.getId())
+                            .word(keyword.getWord())
+                            .notificationEnabled(k.isNotificationEnabled())
+                            .build();
+                }).collect(Collectors.toList());
     }
 
     public void getUserKeywords(Long userId) {
