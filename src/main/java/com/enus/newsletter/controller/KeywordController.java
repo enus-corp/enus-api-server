@@ -30,14 +30,15 @@ public class KeywordController {
         this.keywordService = keywordService;
     }
 
-    @GetMapping("getKeywords/{userId}")
-    public ResponseEntity<GeneralServerResponse<Void>> getKeywords(@PathVariable("userId") Long userId) {
-        keywordService.getUserKeywords(userId);
+    @GetMapping("getKeywords")
+    public ResponseEntity<GeneralServerResponse<List<KeywordDTO>>> getKeywords(
+            @AuthenticationPrincipal UserDTO currentUser) {
+        List<KeywordDTO> keywords = keywordService.getUserKeywords(currentUser.getUserId());
         return ResponseEntity.ok(new GeneralServerResponse<>(
             false, 
             "Successfully returned registered keywords",
             0, 
-            null));
+            keywords));
     }
 
     @PostMapping("batchAdd")

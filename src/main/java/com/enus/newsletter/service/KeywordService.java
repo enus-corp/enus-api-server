@@ -35,6 +35,18 @@ public class KeywordService{
         this.keywordRepository = keywordRepository;
     }
 
+    public List<KeywordDTO> getUserKeywords(Long userId) {
+        UserEntity user = userRepository.findUserById(userId);
+
+        return userKeywordRepository.findByUser(user).stream()
+                .map(uk -> KeywordDTO.builder()
+                        .id(uk.getKeyword().getId())
+                        .word(uk.getKeyword().getWord())
+                        .notificationEnabled(uk.isNotificationEnabled())
+                        .build()).collect(Collectors.toList());
+
+    }
+
     @Transactional
     public KeywordDTO addKeywordToUser(Long userId, KeywordRequest req) {
         log.info("Adding Keyword for user : {}", userId);
@@ -99,8 +111,6 @@ public class KeywordService{
                 }).collect(Collectors.toList());
     }
 
-    public void getUserKeywords(Long userId) {
-        log.info("Getting keywords for user with id: {}", userId);
-    }
+
     
 }
