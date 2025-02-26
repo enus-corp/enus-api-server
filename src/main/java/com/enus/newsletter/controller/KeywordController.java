@@ -4,6 +4,8 @@ import com.enus.newsletter.model.dto.KeywordDTO;
 import com.enus.newsletter.model.dto.UserDTO;
 import com.enus.newsletter.model.request.keyword.BatchKeywordRequest;
 import com.enus.newsletter.model.request.keyword.KeywordRequest;
+import com.enus.newsletter.model.request.keyword.UpdateKeywordNotificationRequest;
+import com.enus.newsletter.system.IdReq;
 import jakarta.validation.Valid;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -63,6 +65,34 @@ public class KeywordController {
         return ResponseEntity.ok(new GeneralServerResponse<>(
             false,
             "Successfully saved keywords",
+            0,
+            keyword));
+    }
+
+    @DeleteMapping("delete")
+    public ResponseEntity<GeneralServerResponse<Void>> deleteKeyword(
+            @AuthenticationPrincipal UserDTO currentUser,
+            @Valid @RequestBody IdReq keywordId) {
+        log.info("[KeywordController][Delete Keyword] Deleting keyword");
+        log.info(currentUser.getUserId().toString());
+        log.info(keywordId.getId().toString());
+        keywordService.removeKeywordFromUser(currentUser.getUserId(), keywordId.getId());
+        return ResponseEntity.ok(new GeneralServerResponse<Void>(
+            false,
+            "Successfully deleted keyword",
+            0,
+            null));
+    }
+
+    @PutMapping("notification")
+    public ResponseEntity<GeneralServerResponse<KeywordDTO>> toggleNotification(
+            @AuthenticationPrincipal UserDTO currentUser,
+            @Valid @RequestBody UpdateKeywordNotificationRequest req) {
+        log.info("[KeywordController][Toggle Notification] Toggling notification for keyword");
+        KeywordDTO keyword = keywordService.updateKeywordNotification(currentUser.getUserId(), req);
+        return ResponseEntity.ok(new GeneralServerResponse<KeywordDTO>(
+            false,
+            "Successfully toggled notification",
             0,
             keyword));
     }

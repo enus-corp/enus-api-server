@@ -5,6 +5,8 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import com.enus.newsletter.db.AbsBaseRepository;
+import com.enus.newsletter.exception.keyword.KeywordErrorCode;
+import com.enus.newsletter.exception.keyword.KeywordException;
 import org.springframework.stereotype.Repository;
 
 import com.enus.newsletter.db.entity.KeywordEntity;
@@ -20,6 +22,10 @@ public class KeywordRepository extends AbsBaseRepository<KeywordEntity, IKeyword
 
     public KeywordRepository(IKeywordRepository keywordRepository) {
         super(keywordRepository);
+    }
+
+    public Optional<KeywordEntity> findById(Long id) {
+        return repository.findById(id);
     }
 
     public Optional<KeywordEntity> findByWord(String word) {
