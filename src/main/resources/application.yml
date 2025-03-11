@@ -1,4 +1,6 @@
 spring:
+  kafka:
+    bootstrap-servers: localhost:9092
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
 #  security:
