@@ -14,14 +14,22 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
 
+    @Value("${spring.activemq.user}")
+    private String activeMqUser;
+
+    @Value("${spring.activemq.password}")
+    private String activeMqPassword;
+
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         // client will subscribe to this endpoint
         registry.enableStompBrokerRelay("/topic", "queue")
                 .setRelayHost("localhost")
                 .setRelayPort(61613) // default stop port
-                .setClientLogin("guest")
-                .setClientPasscode("guest")
+                .setClientLogin(activeMqUser)
+                .setClientPasscode(activeMqPassword)
+                .setSystemLogin(activeMqUser)
+                .setSystemPasscode(activeMqPassword)
                 .setSystemHeartbeatReceiveInterval(10000)
                 .setSystemHeartbeatSendInterval(10000);
 
