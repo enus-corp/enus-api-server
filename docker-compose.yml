@@ -1,0 +1,23 @@
+version: '3'
+services:
+  artemis:
+    image: apache/activemq-artemis
+    ports:
+      - "61616:61616" # JMS
+      - "8161:8161" # Web Console
+      - "61613:61613" # STOMP
+    container_name: activemq-container
+    environment:
+      - ARTEMIS_USER=${ARTEMIS_USER}
+      - ARTEMIS_PASSWORD=${ARTEMIS_PASSWORD}
+    restart: always
+  postgres:
+    image: postgres
+    ports:
+      - "5432:5432"
+    container_name: postgres-container
+    environment:
+      - POSTGRES_URL=${DB_URL}
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    restart: always

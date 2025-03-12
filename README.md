@@ -25,3 +25,10 @@
 ---
 1. open the Spring Boot Dashboard at the left side of the IDE
 2. Click the arrow button newxt to APPS - enus-api-server
+
+
+### Running docker compose
+---
+- Create a .env file and fill in the credentials (refer to the .env_template file)
+- Load containers: `docker compose up -d`
+- Unload containers: `docker compose down`
