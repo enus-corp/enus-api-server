@@ -23,7 +23,7 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         // client will subscribe to this endpoint
-        registry.enableStompBrokerRelay("/topic", "queue")
+        registry.enableStompBrokerRelay("/topic", "/queue")
                 .setRelayHost("localhost")
                 .setRelayPort(61613) // default stop port
                 .setClientLogin(activeMqUser)
@@ -40,6 +40,9 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // client will connect to this endpoint
-        registry.addEndpoint("/ws").setAllowedOrigins("*").withSockJS();
+        // TODO. Should not use setAllowedOriginPatterns("*") in production
+        registry.addEndpoint("/ws")
+                .setAllowedOriginPatterns("*")
+                .withSockJS();
     }
 }
