@@ -57,6 +57,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
+                                // Internal testing
+                                "/websocket-client.html",
                                 // Swagger
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
@@ -67,7 +69,8 @@ public class SecurityConfig {
                                 "/api/auth/verifyEmail",
                                 "/api/auth/resetPassword",
                                 // Error
-                                "/error"
+                                "/error",
+                                "/ws/**"
                         ).permitAll()
                         .requestMatchers("/api/keyword/**").authenticated()
                         .anyRequest().authenticated()
