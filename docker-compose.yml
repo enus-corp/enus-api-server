@@ -20,4 +20,9 @@ services:
       - POSTGRES_URL=${DB_URL}
       - POSTGRES_USER=${DB_USERNAME}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     restart: always
+volumes:
+  postgres_data:
+    name: "postgres_data"
