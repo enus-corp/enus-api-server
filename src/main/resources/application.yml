@@ -1,4 +1,7 @@
 spring:
+  activemq:
+    user: ${ARTEMIS_USER}
+    password: ${ARTEMIS_PASSWORD}
   kafka:
     bootstrap-servers: localhost:9092
   liquibase:
