@@ -32,3 +32,9 @@
 - Create a .env file and fill in the credentials (refer to the .env_template file)
 - Load containers: `docker compose up -d`
 - Unload containers: `docker compose down`
+
+### Build executable JAR file
+---
+- `.gradelw bootJar`
+- copy the jar file from `build/libs` to the server (Home directory)
+- run the jar file: `java -jar <jar file name>`
