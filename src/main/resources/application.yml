@@ -36,9 +36,9 @@ spring:
 #            user-info-authentication-method: header
 
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/enus}
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:password}
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
       pool-name: enus-connection-pool
@@ -76,4 +76,3 @@ logging.level.org.springframework.security: trace
 jwt.security.secret-key: 7f3080cd92f5cbd8137a21f0e691b5da58079cde71260ab07a699859b4877f6e
 jwt.security.access-token.expiration: 900000 # 15 Minutes
 jwt.security.refresh-token.expiration: 604800000 # 7 Days
-
