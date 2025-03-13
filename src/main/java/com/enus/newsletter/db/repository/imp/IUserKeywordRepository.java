@@ -4,10 +4,12 @@ import com.enus.newsletter.db.entity.KeywordEntity;
 import com.enus.newsletter.db.entity.UserEntity;
 import com.enus.newsletter.db.entity.UserKeywordEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 public interface IUserKeywordRepository extends JpaRepository<UserKeywordEntity, Long> {
     List<UserKeywordEntity> findByUser(UserEntity user);
     Optional<UserKeywordEntity> findByUserAndKeyword(UserEntity user, KeywordEntity keyword);
