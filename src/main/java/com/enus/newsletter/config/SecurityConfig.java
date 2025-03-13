@@ -2,6 +2,7 @@ package com.enus.newsletter.config;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -28,7 +29,7 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     public SecurityConfig(
-            AuthenticationProvider authenticationProvider,
+            @Qualifier("authenticationProvider") AuthenticationProvider authenticationProvider,
             JwtAuthenticationFilter jwtAuthenticationFilter
     ) {
         this.authenticationProvider = authenticationProvider;
