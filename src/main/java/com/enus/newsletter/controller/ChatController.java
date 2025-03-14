@@ -1,18 +1,28 @@
 package com.enus.newsletter.controller;
 
 import com.enus.newsletter.model.dto.ChatMessage;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import com.enus.newsletter.service.ChatService;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 
 @Controller
 @Slf4j(topic = "CHAT_CONTROLLER")
 public class ChatController {
+    private ChatService chatService;
+
+    public ChatController(ChatService chatService) {
+        this.chatService = chatService;
+    }
 
     @MessageMapping("/chat")
-    public void chat(@Payload ChatMessage message) {
+    @SendTo("/topic/messages")
+    public ChatMessage chat(@Payload ChatMessage message) {
         log.info("Received message: {}", message);
+        chatService.saveChatHistory(message);
+        return message;
     }
 }

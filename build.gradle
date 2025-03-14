@@ -24,6 +24,7 @@ repositories {
 }
 
 dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis:3.4.3'
 	implementation 'io.projectreactor.netty:reactor-netty:1.2.3'
 	implementation 'io.netty:netty-resolver-dns-native-macos:4.1.100.Final:osx-aarch_64'
 	implementation 'org.springframework:spring-messaging:6.2.3'
