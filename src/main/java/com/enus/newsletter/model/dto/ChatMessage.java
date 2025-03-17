@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatMessage implements Serializable {
+    private String sessionId;
     private String sender;
     private String content;
 }

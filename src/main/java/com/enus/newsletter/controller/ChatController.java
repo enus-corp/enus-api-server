@@ -23,7 +23,7 @@ public class ChatController {
     @SendTo("/topic/messages")
     public ChatMessage chat(@Payload ChatMessage message) {
         log.info("Received message: {}", message);
-        chatService.saveChatHistory(message);
-        return message;
+        ChatMessage c = chatService.saveChatHistory(message);
+        return c;
     }
 }

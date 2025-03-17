@@ -18,32 +18,35 @@ public class ChatService {
     // private IRedisRepository redisRepository;
     private IChatSessionRepository chatSessionRepository;
     private IChatMessageRepository chatMessageRepository;
-    private RedisTemplate<String, ChatMessage> redisTemplate;
+    // private RedisTemplate<String, ChatMessage> redisTemplate;
 
     public ChatService(
         // IRedisRepository redisRepository, 
-        IChatSessionRepository chatSessionRepository, RedisTemplate<String, ChatMessage> redisTemplate, IChatMessageRepository chatMessageRepository) {
+        IChatSessionRepository chatSessionRepository, 
+        // RedisTemplate<String, ChatMessage> redisTemplate, 
+        IChatMessageRepository chatMessageRepository) {
+
         this.chatMessageRepository = chatMessageRepository;    
         // this.redisRepository = redisRepository;
         this.chatSessionRepository = chatSessionRepository;
-        this.redisTemplate = redisTemplate;
+        // this.redisTemplate = redisTemplate;
     }
 
-    public void saveChatHistory(ChatMessage chat) {
+    public ChatMessage saveChatHistory(ChatMessage chat) {
         // Return chat session ID to client
         String chatSessionId = UUID.randomUUID().toString();
+        chat.setSessionId(chatSessionId);
 
         // save chat content to mongodb
         ChatMessageDocument chatMessageDocument = ChatMessageDocument.builder()
-            .id(chatSessionId)
+            .sessionId(chatSessionId)
             .sender(chat.getSender())
             .content(chat.getContent())
             .timestamp(LocalDateTime.now())
             .build();
 
         chatMessageRepository.save(chatMessageDocument);
-        // redisRepository.save(chat);
-        // redisTemplate.expire(chat.getId(), Duration.ofDays(30));
+        return chat;
     }
 
     public void saveChatSession(ChatSessionEntity chat) {
