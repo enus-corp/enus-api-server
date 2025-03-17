@@ -1,4 +1,4 @@
-package com.enus.newsletter.ws.model;
+package com.enus.newsletter.model.ws;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

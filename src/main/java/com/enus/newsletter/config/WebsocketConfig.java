@@ -1,4 +1,4 @@
-package com.enus.newsletter.ws;
+package com.enus.newsletter.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -45,4 +45,5 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
                 .setAllowedOriginPatterns("*")
                 .withSockJS();
     }
+
 }

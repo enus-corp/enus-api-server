@@ -1,5 +1,6 @@
 spring:
   activemq:
+    broker-url: ${ARTEMIS_BROKER_URL}
     user: ${ARTEMIS_USER}
     password: ${ARTEMIS_PASSWORD}
   kafka:

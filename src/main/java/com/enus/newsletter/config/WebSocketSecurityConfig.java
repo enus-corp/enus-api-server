@@ -1,3 +1,4 @@
+package com.enus.newsletter.config;
 //package com.enus.newsletter.ws;
 //
 //import org.springframework.context.annotation.Configuration;
