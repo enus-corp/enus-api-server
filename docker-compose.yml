@@ -34,9 +34,23 @@ services:
     volumes:
       - redis_data:/data
     restart: always
+  mongodb:
+    image: mongo
+    ports:
+      - "27017:27017"
+    container_name: mongodb-container
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD}
+      - MONGO_INITDB_DATABASE=${MONGODB_DATABASE}
+    volumes:
+      - mongodb_data:/data/db
+    restart: always
 volumes:
   postgres_data:
     name: "postgres_data"
   redis_data:
     name: "redis_data"
+  mongodb_data:
+    name: "mongodb_data"
 

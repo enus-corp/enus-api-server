@@ -47,7 +47,7 @@ public class SecurityConfig {
         log.info("---------- Security Filter Chain -----------");
 
         return http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                // .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 // .oauth2Login(config ->
                 //         config
