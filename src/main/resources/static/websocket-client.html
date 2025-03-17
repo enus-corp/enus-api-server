@@ -49,7 +49,7 @@
     function sendMessage() {
         const message = document.getElementById('message').value;
         stompClient.send("/app/chat", {},
-            JSON.stringify({content: message}));
+            JSON.stringify({sender: "rlee", content: message}));
     }
 </script>
 </body>
