@@ -28,11 +28,18 @@
             console.log('Subscribing to /topic')
             document.getElementById('output').innerHTML += '<p>Connected!</p>';
 
-            // Subscribe to topic
-            stompClient.subscribe('/topic/news', function(message) {
-                document.getElementById('output').innerHTML +=
-                    '<p>Received: ' + message.body + '</p>';
+            stompClient.subscribe('/topic/init', function(message) {
+                let chatId = JSON.parse(message.body).chatSessionId;
+                console.log("User Entered Chatroom with ID: " + chatId);
+
+                // Subscribe to topic
+                stompClient.subscribe(`/topic/news`, function(message) {
+                    document.getElementById('output').innerHTML +=
+                    '<p>Received: ' + chatId + '</p>';
+                });
             });
+            
+            stompClient.send("/app/init", {})
         }, function(error) {
             document.getElementById('output').innerHTML +=
                 '<p>Error: ' + error + '</p>';
