@@ -35,7 +35,7 @@ public class ChatService {
     public ChatMessage saveChatHistory(ChatMessage chat) {
         // Return chat session ID to client
         String chatSessionId = UUID.randomUUID().toString();
-        chat.setSessionId(chatSessionId);
+        chat.setChatId(chatSessionId);
 
         // save chat content to mongodb
         ChatMessageDocument chatMessageDocument = ChatMessageDocument.builder()

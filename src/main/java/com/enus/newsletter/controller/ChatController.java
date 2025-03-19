@@ -23,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j(topic = "CHAT_CONTROLLER")
 public class ChatController {
     private ChatService chatService;
-
     private final SimpMessagingTemplate messagingTemplate;
 
     public ChatController(ChatService chatService, SimpMessagingTemplate messagingTemplate) {
@@ -53,5 +52,21 @@ public class ChatController {
         log.info("Received message: {}", message);
         ChatMessage c = chatService.saveChatHistory(message);
         return c;
+    }
+
+    @MessageMapping("/chat/client/{chatId}")
+    @SendTo("/topic/server/{chatId}")
+    public ChatMessage handleClientMessage(@Payload ChatMessage message) {
+        log.info("Received message: {}", message);
+        chatService.saveChatHistory(message);
+        return message;
+    }
+
+    @MessageMapping("/chat/server/{chatId}")
+    @SendTo("/topic/client/{chatId}")
+    public ChatMessage handleServerMessage(@Payload ChatMessage message) {
+        log.info("Received message: {}", message);
+        chatService.saveChatHistory(message);
+        return message;
     }
 }
