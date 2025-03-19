@@ -1,8 +1,17 @@
 package com.enus.newsletter.controller;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+
+import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Controller;
 
 import com.enus.newsletter.model.dto.ChatMessage;
@@ -15,8 +24,27 @@ import lombok.extern.slf4j.Slf4j;
 public class ChatController {
     private ChatService chatService;
 
-    public ChatController(ChatService chatService) {
+    private final SimpMessagingTemplate messagingTemplate;
+
+    public ChatController(ChatService chatService, SimpMessagingTemplate messagingTemplate) {
         this.chatService = chatService;
+        this.messagingTemplate = messagingTemplate;
+    }
+
+    @MessageMapping("/request-chat-id")
+    @SendTo("/topic/chat")
+    public Map<String, String> requestChatId(Message<?> message) {
+        log.info("Received request for chat id");
+        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+        String sessionId = accessor.getSessionId();
+        String chatId = UUID.randomUUID().toString();
+
+        Map<String, String> sessionInfo = new HashMap<>();
+        sessionInfo.put("chatId", chatId);
+        sessionInfo.put("timestamp", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        log.info("Sending session info: {}", sessionInfo);
+        // messagingTemplate.convertAndSendToUser(sessionId, "/topic/chat", sessionInfo);
+        return sessionInfo;
     }
 
     @MessageMapping("/chat")

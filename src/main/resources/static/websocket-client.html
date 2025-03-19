@@ -24,15 +24,25 @@
         stompClient = Stomp.over(socket);
 
         stompClient.connect({}, function(frame) {
-            console.log('Connected: ' + frame);
-            console.log('Subscribing to /topic')
-            document.getElementById('output').innerHTML += '<p>Connected!</p>';
-
+            document.getElementById('output').innerHTML += '<p>WS Connected!</p>';
             // Subscribe to topic
-            stompClient.subscribe('/topic/news', function(message) {
-                document.getElementById('output').innerHTML +=
-                    '<p>Received: ' + message.body + '</p>';
+            const temp = stompClient.subscribe('/topic/chat', function(message) {
+                const data = JSON.parse(message.body);
+                // have to check if the message is for the user
+                const chatId = data.chatId;
+                console.log("Received chat ID: ", chatId);
+
+                temp.unsubscribe();
+
+                stompClient.subscribe(`/topic/${chatId}`, function(message) {
+                    const data = JSON.parse(message.body);
+                    document.getElementById('output').innerHTML +=
+                        '<p>' + data.sender + ': ' + data.content + '</p>';
+                });
             });
+
+            stompClient.send("/app/request-chat-id", {}, {})
+
         }, function(error) {
             document.getElementById('output').innerHTML +=
                 '<p>Error: ' + error + '</p>';
