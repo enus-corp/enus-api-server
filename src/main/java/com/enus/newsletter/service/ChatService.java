@@ -3,7 +3,6 @@ package com.enus.newsletter.service;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import com.enus.newsletter.db.entity.ChatSessionEntity;

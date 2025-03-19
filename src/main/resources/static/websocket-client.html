@@ -18,29 +18,31 @@
 
 <script>
     let stompClient = null;
+    let chatId = null;
 
     function connect() {
         const socket = new SockJS('http://localhost:8080/ws');
         stompClient = Stomp.over(socket);
 
+        // 1. Establish websocket/stomp connection
         stompClient.connect({}, function(frame) {
             document.getElementById('output').innerHTML += '<p>WS Connected!</p>';
-            // Subscribe to topic
-            const temp = stompClient.subscribe('/topic/chat', function(message) {
-                const data = JSON.parse(message.body);
-                // have to check if the message is for the user
-                const chatId = data.chatId;
-                console.log("Received chat ID: ", chatId);
+            
+            // listen to user specific queue
+            stompClient.subscribe("/user/queue/chat", function(message) {
+                console.log("/user/queue/chat");
+                chatId = JSON.parse(message.body)["chatId"];
+                console.log("Received chat id -> ", chatId);
 
-                temp.unsubscribe();
-
-                stompClient.subscribe(`/topic/${chatId}`, function(message) {
+                stompClient.subscribe("/topic/"+chatId, function(message) {
+                    console.log("/topic/"+chatId);
                     const data = JSON.parse(message.body);
                     document.getElementById('output').innerHTML +=
                         '<p>' + data.sender + ': ' + data.content + '</p>';
                 });
-            });
+            })
 
+            // 1. request for chat session id
             stompClient.send("/app/request-chat-id", {}, {})
 
         }, function(error) {
@@ -59,7 +61,7 @@
     function sendMessage() {
         const message = document.getElementById('message').value;
         stompClient.send("/app/chat", {},
-            JSON.stringify({sender: "rlee", content: message}));
+            JSON.stringify({sender: "rlee", chatId, content: message}));
     }
 </script>
 </body>
