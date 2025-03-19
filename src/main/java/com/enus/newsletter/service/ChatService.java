@@ -1,7 +1,6 @@
 package com.enus.newsletter.service;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
@@ -33,12 +32,10 @@ public class ChatService {
 
     public ChatMessage saveChatHistory(ChatMessage chat) {
         // Return chat session ID to client
-        String chatSessionId = UUID.randomUUID().toString();
-        chat.setChatId(chatSessionId);
 
         // save chat content to mongodb
         ChatMessageDocument chatMessageDocument = ChatMessageDocument.builder()
-            .sessionId(chatSessionId)
+            .sessionId(chat.getChatId())
             .sender(chat.getSender())
             .content(chat.getContent())
             .timestamp(LocalDateTime.now())
@@ -51,4 +48,8 @@ public class ChatService {
     public void saveChatSession(ChatSessionEntity chat) {
         chatSessionRepository.save(chat);
     }
+
+    // public void getchatHistory(String chatId) {
+    //     Query query = new Query(Criteria.where("chatId").is(chatId)).with(Sort.by(Sort.Direction.ASC, "timestamp"));
+    // }
 }
