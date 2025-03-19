@@ -9,7 +9,6 @@ import java.util.UUID;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
@@ -45,10 +44,10 @@ public class ChatController {
     }
 
     @MessageMapping("/chat")
-    @SendTo("/chat")
-    public ChatMessage handleClientMessage(@Payload ChatMessage message) {
+    public void handleClientMessage(@Payload ChatMessage message) {
         log.info("Received message: {}", message);
         chatService.saveChatHistory(message);
-        return message;
+        messagingTemplate.convertAndSend("/topic/ai-requests", message);
+        log.info("Forwared message to AI server: {}", message);
     }
 }
