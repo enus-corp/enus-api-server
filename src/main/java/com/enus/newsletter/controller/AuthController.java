@@ -19,7 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name="Auth", description = "Authentication")
-@Slf4j(topic = "AuthController")
+@Slf4j(topic = "AUTH_CONTROLLER")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -31,17 +31,17 @@ public class AuthController {
 
     @PostMapping("signup")
     public ResponseEntity<GeneralServerResponse<UserEntity>> signup(@Valid @RequestBody SignupRequest dto) {
-      log.info("---------------- Signup request: {} ----------------", dto);
-      UserEntity user = authService.signup(dto);
-      GeneralServerResponse<UserEntity> response = new GeneralServerResponse<UserEntity>(
+        log.info("---------------- Signup request: {} ----------------", dto);
+        UserEntity user = authService.signup(dto);
+        GeneralServerResponse<UserEntity> response = new GeneralServerResponse<UserEntity>(
             false,
             "Successfully created user",
             200,
             user
-      );
+        );
 
-      log.info("---------------- Signup response: {} ----------------", response);
-      return ResponseEntity.ok(response);
+        log.info("---------------- Signup response: {} ----------------", response);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/signin")

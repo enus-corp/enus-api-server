@@ -3,6 +3,7 @@ package com.enus.newsletter.model.request.auth;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
@@ -49,4 +50,7 @@ public class SignupRequest {
     @Email(message = "Invalid email format")
     @NotBlank(message = "Email is required")
     private String email;
+
+    @NotEmpty(message = "Age is required")
+    private int age;
 }

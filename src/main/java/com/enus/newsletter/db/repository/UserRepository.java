@@ -55,7 +55,8 @@ public class UserRepository extends AbsBaseRepository<UserEntity, IUserRepositor
                     dto.getLastName(),
                     dto.getUsername(),
                     passwordEncoder.encode(dto.getPassword()),
-                    dto.getEmail()
+                    dto.getEmail(),
+                    dto.getAge()
             );
 
             return repository.save(user);

@@ -1,9 +1,6 @@
 package com.enus.newsletter.db.entity;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 import jakarta.persistence.*;
@@ -12,8 +9,6 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import jakarta.validation.constraints.Email;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
 @Table(name = "users", indexes = {
@@ -30,13 +25,15 @@ public class UserEntity extends BaseEntity {
             @NotBlank @Size(max = 50) String lastName,
             @NotBlank @Size(max = 50) String username,
             @NotBlank @Size(max = 100) String password,
-            @NotBlank @Size(max = 100) @Email String email
+            @NotBlank @Size(max = 100) @Email String email,
+            @NotBlank int age
     ) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
         this.email = email;
         this.password = password;
+        this.age = age;
     }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -58,6 +55,9 @@ public class UserEntity extends BaseEntity {
     @Column(nullable = false, length = 100)
     @Email
     private String email;
+
+    @Column(nullable = false)
+    private int age;
 
     @Column(nullable = false, name = "is_expired", columnDefinition = "smallint default 0")
     private short isExpired;
