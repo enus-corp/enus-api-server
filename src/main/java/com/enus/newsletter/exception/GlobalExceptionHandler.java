@@ -2,9 +2,6 @@ package com.enus.newsletter.exception;
 
 import com.enus.newsletter.system.GeneralServerResponse;
 
-import lombok.extern.log4j.Log4j2;
-
-import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -33,7 +30,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         log.error("---------------- Validation error: {} ----------------", ex.getMessage());
-        Map<String, List<String>> body = new HashMap<>();
 
         Map<String, String> errors = ex.getBindingResult()
                 .getFieldErrors()
