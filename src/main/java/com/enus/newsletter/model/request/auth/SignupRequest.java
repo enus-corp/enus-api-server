@@ -1,9 +1,13 @@
 package com.enus.newsletter.model.request.auth;
 
 
+import com.enus.newsletter.enums.Gender;
+import com.enus.newsletter.validation.ValidEnum;
+
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
@@ -24,22 +28,6 @@ public class SignupRequest {
     @Size(min = 8, max = 20, message = "Username must be between 8 to 20 characters")
     private String username;
 
-//    @NotBlank(message = "Gender is required")
-//    private int gender;
-//
-//    private String occupation;
-//
-//    private List<String> newsCategories;
-//
-//    private List<String> readingPurpose;
-//
-//    private List<String> importantFactors;
-//
-//    private List<String> preferredMediaType;
-//
-//    @Size(max = 500)
-//    private String newSelectionCriteria;
-
     @NotBlank(message = "Password is required")
     @Pattern(
             regexp = "^(?=.*[A-Z])(?=.*[!@#$%^&*(),.?\":{}|<>])(?=.*\\d)(?=.*[a-z]).{8,}$",
@@ -51,6 +39,11 @@ public class SignupRequest {
     @NotBlank(message = "Email is required")
     private String email;
 
-    @NotEmpty(message = "Age is required")
-    private int age;
+    @NotNull(message = "Gender is required")
+    @ValidEnum(enumClass=Gender.class)
+    private String gender;
+
+    @NotNull(message = "Age is required")
+    @Min(value=1, message = "Age must be greater than 0")
+    private Integer age;
 }
