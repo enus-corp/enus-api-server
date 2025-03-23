@@ -1,23 +1,20 @@
 package com.enus.newsletter.exception;
 
-import com.enus.newsletter.system.GeneralServerResponse;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import org.springframework.validation.FieldError;
+import com.enus.newsletter.system.GeneralServerResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,6 +22,18 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j(topic="GLOBAL_EXCEPTION_HANDLER")
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
+    @Override
+    protected ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        log.error("[handleExceptionInternal]", ex.getMessage());
+        GeneralServerResponse<Void> response = new GeneralServerResponse<>(
+            true,
+            ex.getMessage(),
+            0,
+            null
+        );
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 
     // Validation handler
     @Override
