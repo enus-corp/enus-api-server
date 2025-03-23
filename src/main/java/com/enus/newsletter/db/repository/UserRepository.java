@@ -1,11 +1,13 @@
 package com.enus.newsletter.db.repository;
 
 import com.enus.newsletter.db.AbsBaseRepository;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
 import com.enus.newsletter.db.entity.UserEntity;
 import com.enus.newsletter.db.repository.imp.IUserRepository;
+import com.enus.newsletter.enums.Gender;
 import com.enus.newsletter.exception.user.UserErrorCode;
 import com.enus.newsletter.exception.user.UserException;
 import com.enus.newsletter.model.request.auth.SignupRequest;
@@ -56,6 +58,7 @@ public class UserRepository extends AbsBaseRepository<UserEntity, IUserRepositor
                     dto.getUsername(),
                     passwordEncoder.encode(dto.getPassword()),
                     dto.getEmail(),
+                    Gender.valueOf(dto.getGender()),
                     dto.getAge()
             );
 

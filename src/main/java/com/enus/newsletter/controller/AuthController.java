@@ -33,7 +33,7 @@ public class AuthController {
     public ResponseEntity<GeneralServerResponse<UserEntity>> signup(@Valid @RequestBody SignupRequest dto) {
         log.info("---------------- Signup request: {} ----------------", dto);
         UserEntity user = authService.signup(dto);
-        GeneralServerResponse<UserEntity> response = new GeneralServerResponse<UserEntity>(
+        GeneralServerResponse<UserEntity> response = new GeneralServerResponse<>(
             false,
             "Successfully created user",
             200,
@@ -50,7 +50,7 @@ public class AuthController {
         String ip = request.getHeader("X-FORWARDED-FOR");
         ip = ip != null ? ip.split(",")[0] : request.getRemoteAddr();
         Token token = authService.authenticate(dto, ip);
-        GeneralServerResponse<Token> response = new GeneralServerResponse<Token>(
+        GeneralServerResponse<Token> response = new GeneralServerResponse<>(
                 false,
                 "Successfully authenticated user",
                 200,
@@ -76,7 +76,7 @@ public class AuthController {
     public ResponseEntity<GeneralServerResponse<Void>> resetPassword(@Valid @RequestBody ResetPasswordRequest dto) {
         authService.resetPassword(dto);
         return ResponseEntity.ok(
-                new GeneralServerResponse<Void>(
+                new GeneralServerResponse<>(
                         false,
                         "Successfully reset password",
                         200,
@@ -93,7 +93,7 @@ public class AuthController {
     @PostMapping("/refresh")
     public ResponseEntity<GeneralServerResponse<Token>> refresh(@Valid @RequestBody RefreshTokenRequest dto) {
         Token token = authService.refreshToken(dto);
-        GeneralServerResponse<Token> response = new GeneralServerResponse<Token>(
+        GeneralServerResponse<Token> response = new GeneralServerResponse<>(
                 false,
                 "Successfully refreshed new token",
                 200,
