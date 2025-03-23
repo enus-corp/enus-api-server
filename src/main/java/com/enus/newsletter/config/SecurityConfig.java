@@ -73,7 +73,6 @@ public class SecurityConfig {
                                 "/error",
                                 "/ws/**"
                         ).permitAll()
-                        .requestMatchers("/api/keyword/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 // check for JWT token in the request
