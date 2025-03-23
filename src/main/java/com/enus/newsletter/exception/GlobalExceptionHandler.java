@@ -42,14 +42,25 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(CustomBaseException.class)
     public ResponseEntity<GeneralServerResponse<Void>> handleException(CustomBaseException exception) {
         log.info("---------------- Exception Handler: {} ----------------", exception.getMessage());
-        return ResponseEntity.ok(
-                new GeneralServerResponse<Void>(
-                        true,
-                        exception.getMessage(),
-                        exception.getErrorCode(),
-                        null
-                )
+        GeneralServerResponse<Void> response = new GeneralServerResponse<>(
+                true,
+                exception.getMessage(),
+                exception.getErrorCode(),
+                null
         );
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<GeneralServerResponse<Void>> handleException(Exception exception) {
+        log.error("---------------- Exception Handler: {} ----------------", exception.getMessage());
+        GeneralServerResponse<Void> response = new GeneralServerResponse<>(
+            true,
+            exception.getMessage(),
+            500,
+            null
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 
 }
