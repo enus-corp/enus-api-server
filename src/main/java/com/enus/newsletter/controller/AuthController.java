@@ -1,6 +1,12 @@
 package com.enus.newsletter.controller;
 
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.enus.newsletter.db.entity.UserEntity;
 import com.enus.newsletter.model.request.auth.ResetPasswordRequest;
 import com.enus.newsletter.model.request.auth.SigninRequest;
@@ -11,12 +17,11 @@ import com.enus.newsletter.model.response.Token;
 import com.enus.newsletter.model.response.VerifyViaEmail;
 import com.enus.newsletter.service.AuthService;
 import com.enus.newsletter.system.GeneralServerResponse;
+
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 @Tag(name="Auth", description = "Authentication")
 @Slf4j(topic = "AUTH_CONTROLLER")
@@ -29,7 +34,7 @@ public class AuthController {
         this.authService = authService;
     }
 
-    @PostMapping("signup")
+    @PostMapping("/signup")
     public ResponseEntity<GeneralServerResponse<UserEntity>> signup(@Valid @RequestBody SignupRequest dto) {
         log.info("---------------- Signup request: {} ----------------", dto);
         UserEntity user = authService.signup(dto);
@@ -45,7 +50,7 @@ public class AuthController {
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<GeneralServerResponse<Token>> signin(HttpServletRequest request, @RequestBody SigninRequest dto) {
+    public ResponseEntity<GeneralServerResponse<Token>> signin(HttpServletRequest request, @Valid @RequestBody SigninRequest dto) {
         log.info("\t >>> Signin Request");
         String ip = request.getHeader("X-FORWARDED-FOR");
         ip = ip != null ? ip.split(",")[0] : request.getRemoteAddr();
