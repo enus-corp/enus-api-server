@@ -1,7 +1,9 @@
 package com.enus.newsletter.exception;
 
 import com.enus.newsletter.system.GeneralServerResponse;
+
 import lombok.extern.log4j.Log4j2;
+
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -16,27 +18,37 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.validation.FieldError;
+
+import lombok.extern.slf4j.Slf4j;
 
 // Handle exceptions thrown by methods annotated with @RequestMapping
-@Log4j2
+@Slf4j(topic="GLOBAL_EXCEPTION_HANDLER")
 @RestControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     // Validation handler
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        log.error("---------------- Validation error: {} ----------------", ex.getMessage());
         Map<String, List<String>> body = new HashMap<>();
 
-        List<String> errors = ex.getBindingResult()
+        Map<String, String> errors = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
-                .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                .toList();
+                .collect(
+                    Collectors.toMap(
+                        FieldError::getField, 
+                        FieldError::getDefaultMessage
+                        ));
 
-        body.put("errors", errors);
+        log.info(errors.toString());
+        GeneralServerResponse<Map<String, String>> response = new GeneralServerResponse<>(
+            true,  "Validation failed", 0, errors);
 
-        log.error("---------------- Validation error: {} ----------------", ex.getMessage());
-        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @ExceptionHandler(CustomBaseException.class)
