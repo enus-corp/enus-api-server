@@ -2,6 +2,8 @@ package com.enus.newsletter.db.entity;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,16 +26,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ChatSessionEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, name = "chat_id")
     private String chatId;
     
+    @CreationTimestamp
     @Column(nullable = false, name = "start_time")
     private LocalDateTime startTime;
     
-    @Column(nullable = false, name = "end_time")
+    @Column(nullable = true, name = "end_time")
     private LocalDateTime endTime;
 
     @ManyToOne(fetch = FetchType.LAZY)

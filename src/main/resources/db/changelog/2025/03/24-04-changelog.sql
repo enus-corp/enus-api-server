@@ -1,0 +1,2 @@
+ALTER TABLE chat_sessions
+ALTER COLUMN end_time DROP NOT NULL;
