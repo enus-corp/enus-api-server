@@ -10,7 +10,6 @@ import com.enus.newsletter.db.mongodb.ChatMessageDocument;
 import com.enus.newsletter.db.mongodb.IChatMessageRepository;
 import com.enus.newsletter.db.repository.imp.IChatSessionRepository;
 import com.enus.newsletter.db.repository.imp.IUserRepository;
-import com.enus.newsletter.exception.user.UserException;
 import com.enus.newsletter.model.dto.ChatMessage;
 
 @Service
