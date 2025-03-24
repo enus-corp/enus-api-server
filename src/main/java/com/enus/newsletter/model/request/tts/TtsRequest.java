@@ -13,7 +13,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
@@ -26,15 +25,15 @@ public class TtsRequest {
     @JsonProperty("chatId")
     private String chatId;
     
-    @NotNull
+    @NotBlank(message = "readSpeed is required")
     @ValidEnum(enumClass=ReadSpeed.class)
     @JsonProperty("readSpeed")
-    private double readSpeed;
+    private String readSpeed;
     
-    @NotNull
+    @NotBlank(message = "detailLevel is required")
     @ValidEnum(enumClass=DetailLevel.class)
     @JsonProperty("detailLevel")
-    private int detailLevel;
+    private String detailLevel;
 
     @Min(5)
     @Max(30)
