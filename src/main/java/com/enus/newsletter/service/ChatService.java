@@ -10,6 +10,8 @@ import com.enus.newsletter.db.mongodb.ChatMessageDocument;
 import com.enus.newsletter.db.mongodb.IChatMessageRepository;
 import com.enus.newsletter.db.repository.imp.IChatSessionRepository;
 import com.enus.newsletter.db.repository.imp.IUserRepository;
+import com.enus.newsletter.exception.user.UserErrorCode;
+import com.enus.newsletter.exception.user.UserException;
 import com.enus.newsletter.model.dto.ChatMessage;
 
 @Service
@@ -31,7 +33,8 @@ public class ChatService {
     }
 
     public void saveChatSessionId(String chatId, long userId) {
-        UserEntity user = userRepository.findById(userId);
+        UserEntity user = userRepository.findById(userId)
+            .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
         ChatSessionEntity entity = new ChatSessionEntity(
             null, // Default ID
             chatId,
