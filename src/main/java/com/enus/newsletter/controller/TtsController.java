@@ -13,9 +13,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.enus.newsletter.db.entity.TtsEntity;
+import com.enus.newsletter.model.dto.TtsDto;
 import com.enus.newsletter.model.dto.UserDTO;
 import com.enus.newsletter.model.request.tts.TtsRequest;
 import com.enus.newsletter.service.TtsService;
+import com.enus.newsletter.system.GeneralServerResponse;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -38,10 +41,16 @@ public class TtsController {
     }
 
     @PostMapping("/set-tts")
-    public ResponseEntity<?> setTTS(@AuthenticationPrincipal UserDTO currentUser, @Valid @RequestBody TtsRequest dto) {
+    public ResponseEntity<GeneralServerResponse<TtsDto>> setTTS(@AuthenticationPrincipal UserDTO currentUser, @Valid @RequestBody TtsRequest req) {
         log.info("Current user: {}", currentUser);
-        log.info("Received request to set TTS speed: {}", dto);
-        // service.saveTTSConfig(dto);
-        return ResponseEntity.ok().build();
+        log.info("Received request to set TTS speed: {}", req);
+        TtsDto ttsDto = service.saveTTSConfig(req);
+        GeneralServerResponse<TtsDto> response = new GeneralServerResponse<>(
+            false,
+            "Successfully saved TTS config for chatID: " + req.getChatId(),
+            0,
+            ttsDto
+        );
+        return ResponseEntity.ok(response);
     }
 }

@@ -5,8 +5,13 @@
 
 package com.enus.newsletter.db.entity;
 
+import com.enus.newsletter.enums.DetailLevel;
+import com.enus.newsletter.enums.ReadSpeed;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -36,7 +41,7 @@ public class TtsEntity {
     private Long id;
 
     @Column(nullable = false, name="read_speed")
-    private float readSpeed;
+    private double readSpeed;
 
     @Column(nullable = false, name="detail_level")
     private int detailLevel;
