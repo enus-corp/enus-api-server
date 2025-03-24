@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.enus.newsletter.db.entity.TtsEntity;
 import com.enus.newsletter.model.dto.TtsDto;
 import com.enus.newsletter.model.dto.UserDTO;
 import com.enus.newsletter.model.request.tts.TtsRequest;
