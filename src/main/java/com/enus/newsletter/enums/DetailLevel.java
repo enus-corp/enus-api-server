@@ -20,4 +20,12 @@ public enum DetailLevel {
     DetailLevel(int value)  {
         this.value = value;
     }
+
+    public int getValue() {
+        return value;
+    }
+
+    public static int getValueByName(String name) {
+        return DetailLevel.valueOf(name.toLowerCase()).getValue();
+    }
 }

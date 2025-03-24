@@ -21,4 +21,11 @@ public enum ReadSpeed {
         this.value = value;
     }
 
+    public double getValue() {
+        return value;
+    }
+
+    public static double getValueByName(String name) {
+        return ReadSpeed.valueOf(name.toLowerCase()).getValue();
+    }
 }
