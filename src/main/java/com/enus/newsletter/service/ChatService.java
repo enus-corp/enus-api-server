@@ -5,29 +5,43 @@ import java.time.LocalDateTime;
 import org.springframework.stereotype.Service;
 
 import com.enus.newsletter.db.entity.ChatSessionEntity;
+import com.enus.newsletter.db.entity.UserEntity;
 import com.enus.newsletter.db.mongodb.ChatMessageDocument;
 import com.enus.newsletter.db.mongodb.IChatMessageRepository;
 import com.enus.newsletter.db.repository.imp.IChatSessionRepository;
+import com.enus.newsletter.db.repository.imp.IUserRepository;
+import com.enus.newsletter.exception.user.UserException;
 import com.enus.newsletter.model.dto.ChatMessage;
 
 @Service
 public class ChatService {
 
-    // private IRedisRepository redisRepository;
     private IChatSessionRepository chatSessionRepository;
     private IChatMessageRepository chatMessageRepository;
-    // private RedisTemplate<String, ChatMessage> redisTemplate;
+    private IUserRepository userRepository;
 
     public ChatService(
-        // IRedisRepository redisRepository, 
         IChatSessionRepository chatSessionRepository, 
-        // RedisTemplate<String, ChatMessage> redisTemplate, 
-        IChatMessageRepository chatMessageRepository) {
+        IChatMessageRepository chatMessageRepository,
+        IUserRepository userRepository) {
 
         this.chatMessageRepository = chatMessageRepository;    
-        // this.redisRepository = redisRepository;
         this.chatSessionRepository = chatSessionRepository;
-        // this.redisTemplate = redisTemplate;
+        this.userRepository = userRepository;
+        
+    }
+
+    public void saveChatSessionId(String chatId, long userId) {
+        UserEntity user = userRepository.findById(userId);
+        ChatSessionEntity entity = new ChatSessionEntity(
+            null, // Default ID
+            chatId,
+            LocalDateTime.now(),
+            null,
+            user,
+            null // TTS Entity not associated
+        );
+        chatSessionRepository.save(entity);
     }
 
     public ChatMessage saveChatHistory(ChatMessage chat) {
@@ -43,10 +57,6 @@ public class ChatService {
 
         chatMessageRepository.save(chatMessageDocument);
         return chat;
-    }
-
-    public void saveChatSession(ChatSessionEntity chat) {
-        chatSessionRepository.save(chat);
     }
 
     // public void getchatHistory(String chatId) {

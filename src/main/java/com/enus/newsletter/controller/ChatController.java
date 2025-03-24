@@ -30,15 +30,19 @@ public class ChatController {
         this.messagingTemplate = messagingTemplate;
     }
 
+    // TODO. Have to set config to get @AuthenticationPrincipal
     @MessageMapping("/request-chat-id")
     @SendToUser("/queue/chat")
-    public Map<String, String> requestChatId(Message<?> message) {
+    public Map<String, String> requestChatId(
+        Message<?> message) {
         log.info("Received request for chat id");
         String chatId = UUID.randomUUID().toString();
 
         Map<String, String> sessionInfo = new HashMap<>();
         sessionInfo.put("chatId", chatId);
         sessionInfo.put("timestamp", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        long mockUserId = 2;
+        chatService.saveChatSessionId(chatId, mockUserId);
         log.info("Sending session info: {}", sessionInfo);
         return sessionInfo;
     }
