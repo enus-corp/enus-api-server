@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class ResetPasswordRequest {
     @NotBlank(message = "Email required")
     @NotBlank(message = "New Password required")
