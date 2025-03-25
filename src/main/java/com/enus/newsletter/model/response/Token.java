@@ -8,9 +8,9 @@ import lombok.Data;
 @Data
 @Builder
 public class Token {
-    @JsonProperty("token")
+    @JsonProperty("accessToken")
     private String accessToken;
 
-    @JsonProperty("refresh")
+    @JsonProperty("refreshToken")
     private String refreshToken;
 }
