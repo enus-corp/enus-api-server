@@ -90,10 +90,6 @@ public class AuthController {
         );
     }
 
-    @PostMapping("/logout")
-    public ResponseEntity<String> logout(@RequestBody String entity) {
-        return ResponseEntity.ok("logout");
-    }
 
     @PostMapping("/refresh")
     public ResponseEntity<GeneralServerResponse<Token>> refresh(@Valid @RequestBody RefreshTokenRequest dto) {
