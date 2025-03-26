@@ -9,10 +9,13 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
+import com.enus.newsletter.exception.user.UserErrorCode;
+import com.enus.newsletter.exception.user.UserException;
 import com.enus.newsletter.model.request.auth.ResetPasswordRequest;
 import com.enus.newsletter.model.request.auth.SigninRequest;
 import com.enus.newsletter.model.request.auth.VerifyViaEmailRequest;
 import com.enus.newsletter.model.request.keyword.RefreshTokenRequest;
+import lombok.With;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +26,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -42,7 +46,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author idohyeon
  */
 @WebMvcTest(AuthController.class)
-@AutoConfigureMockMvc(addFilters = false)
+@AutoConfigureMockMvc(addFilters = true)
 public class AuthControllerTest {
 
     @Autowired
@@ -95,6 +99,7 @@ public class AuthControllerTest {
 
         mockMvc.perform(post("/api/auth/signup")
             .contentType("application/json")
+            .with(csrf())
             .content(objectMapper.writeValueAsString(request)))
                 .andDo(result -> System.out.println(result.getResponse().getContentAsString()))
             .andExpect(status().isOk())
@@ -102,6 +107,57 @@ public class AuthControllerTest {
             .andExpect(jsonPath("$.data.username").value("adminUser123"))
             .andExpect(jsonPath("$.data.email").value("pineapple@test.com"))
             ;
+    }
+
+    @Test
+    @WithMockUser
+    void invalidInput() throws Exception {
+        SignupRequest request = SignupRequest.builder()
+                .username("adminUser123")
+                .email("pineapple@test.com")
+                .password("invalidpassword")
+                .firstName("John")
+                .lastName("Doe")
+                .gender("male")
+                .age(30)
+                .build();
+
+        when(authService.signup(any(SignupRequest.class))).thenReturn(testUser);
+
+        mockMvc.perform(post("/api/auth/signup")
+                .contentType("application/json")
+                        .with(csrf())
+                .content(objectMapper.writeValueAsString(request)))
+                .andDo(result -> System.out.println(result.getResponse().getContentAsString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.error").value(true))
+                .andExpect(jsonPath("$.data.password").value("Password must have at least 8 characters and contain at least one uppercase letter, one lowercase letter, one number, and one special character"));
+    }
+
+    @Test
+    @WithMockUser
+    void userExists() throws Exception {
+        SignupRequest request = SignupRequest.builder()
+                .username("adminUser123")
+                .email("pineapple@test.com")
+                .password("P@ineappleMan123!")
+                .firstName("John")
+                .lastName("Doe")
+                .gender("male")
+                .age(30)
+                .build();
+
+        when(authService.signup(any(SignupRequest.class))).thenThrow(new UserException(UserErrorCode.USER_EXISTS, UserErrorCode.USER_EXISTS.getMessage()));
+
+        mockMvc.perform(post("/api/auth/signup")
+                .contentType("application/json")
+                        .with(csrf())
+                .content(objectMapper.writeValueAsString(request)))
+                .andDo(result -> System.out.println(result.getResponse().getContentAsString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.error").value(true))
+                .andExpect(jsonPath("$.code").value(UserErrorCode.USER_EXISTS.getCode()))
+                .andExpect(jsonPath("$.message").value(UserErrorCode.USER_EXISTS.getMessage()));
     }
 
     @Test
@@ -116,6 +172,7 @@ public class AuthControllerTest {
 
         mockMvc.perform(post("/api/auth/signin")
                 .contentType("application/json")
+                        .with(csrf())
                 .content(objectMapper.writeValueAsString(request)))
                 .andDo(result -> System.out.println(result.getResponse().getContentAsString()))
                 .andExpect(status().isOk())
@@ -137,6 +194,7 @@ public class AuthControllerTest {
 
         mockMvc.perform(post("/api/auth/verifyEmail")
                 .contentType("application/json")
+                        .with(csrf())
                 .content(objectMapper.writeValueAsString(request)))
                 .andDo(result -> System.out.println(result.getResponse().getContentAsString()))
                 .andExpect(status().isOk())
@@ -156,6 +214,7 @@ public class AuthControllerTest {
 
         mockMvc.perform(post("/api/auth/resetPassword")
                 .contentType("application/json")
+                        .with(csrf())
                 .content(objectMapper.writeValueAsString(request)))
                 .andDo(result -> System.out.println(result.getResponse().getContentAsString()))
                 .andExpect(status().isOk())
@@ -177,6 +236,7 @@ public class AuthControllerTest {
 
         mockMvc.perform(post("/api/auth/refresh")
                 .contentType("application/json")
+                        .with(csrf())
                 .content(objectMapper.writeValueAsString(request)))
                 .andDo(result -> System.out.println(result.getResponse().getContentAsString()))
                 .andExpect(status().isOk())
