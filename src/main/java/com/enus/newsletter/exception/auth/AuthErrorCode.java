@@ -10,6 +10,8 @@ public enum AuthErrorCode implements IErrorCode {
     USER_CREATION_FAILED(1004, "User creation failed"),
     ACCOUNT_EXPIRED(1005, "Account expired"),
     ACCOUNT_DISABLED(1006, "Account disabled"),
+    INVALID_RESET_PASSWORD_TOKEN(1007, "Invalid reset password token"),
+    PASSWORD_ALREADY_USED(1008, "Password already used"),
     ;
 
 
