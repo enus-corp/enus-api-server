@@ -19,7 +19,6 @@ import com.enus.newsletter.model.request.auth.SignupRequest;
 import com.enus.newsletter.model.request.auth.VerifyViaEmailRequest;
 import com.enus.newsletter.model.request.keyword.RefreshTokenRequest;
 import com.enus.newsletter.model.response.Token;
-import com.enus.newsletter.model.response.VerifyViaEmail;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.DisabledException;
@@ -127,21 +126,14 @@ public class AuthService {
                 .build();
     }
 
-    public VerifyViaEmail verifyEmail(VerifyViaEmailRequest dto) throws UserException, AuthException {
-        UserEntity user = userRepository.verifyEmail(dto.getEmail());
-
-        String responseCode = generateVerificationCode();
-        String emailCode = generateVerificationCode();
-        return VerifyViaEmail
-                .builder()
-                .otp(responseCode)
-                .build();
+    public void verifyEmail(VerifyViaEmailRequest dto) throws UserException, AuthException {
+        String verificationCode = String.format("%06d", new Random().nextInt(999999));
+        passwordResetTokenRepository.verifyEmail(dto.getEmail(), verificationCode);
     }
 
     public void resetPassword(ResetPasswordRequest dto) throws UserException, AuthException{
         // temporary implementation
         passwordResetTokenRepository.resetPassword(dto);
-
     }
 
     public Token refreshToken(RefreshTokenRequest dto) throws UserException, AuthException {
@@ -165,7 +157,4 @@ public class AuthService {
         }
     }
 
-    private String generateVerificationCode() {
-        return String.format("%06d", new Random().nextInt(999999));
-    }
 }
