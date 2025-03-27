@@ -9,7 +9,6 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -47,8 +46,8 @@ public class SecurityConfig {
         log.info("---------- Security Filter Chain -----------");
 
         return http
-                // .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf -> csrf.disable())
                 // .oauth2Login(config ->
                 //         config
                 //                 .successHandler(oAuth2SuccessHandler)
@@ -57,23 +56,23 @@ public class SecurityConfig {
                 //         )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                // Internal testing
-                                "/websocket-client.html",
-                                // Swagger
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**",
-                                // Authentication
-                                "/api/auth/signup",
-                                "/api/auth/signin",
-                                "/api/auth/refresh",
-                                "/api/auth/verifyEmail",
-                                "/api/auth/resetPassword",
-                                // Error
-                                "/error",
-                                "/ws/**"
-                        ).permitAll()
-                        .anyRequest().authenticated()
+                                .requestMatchers(
+                                        // Internal testing
+                                        "/websocket-client.html",
+                                        // Swagger
+                                        "/swagger-ui/**",
+                                        "/v3/api-docs/**",
+                                        // Authentication
+                                        "/api/auth/signup",
+                                        "/api/auth/signin",
+                                        "/api/auth/refresh",
+                                        "/api/auth/verifyEmail",
+                                        "/api/auth/resetPassword",
+                                        // Error
+                                        "/error",
+                                        "/ws/**"
+                                ).permitAll()
+                                .anyRequest().authenticated()
                 )
                 // check for JWT token in the request
                 // If Token does not exists, pass to UsernamePasswordAuthenticationFilter to authenticate user principal and credential
