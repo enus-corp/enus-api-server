@@ -99,7 +99,6 @@ public class AuthControllerTest {
 
         mockMvc.perform(post("/api/auth/signup")
             .contentType("application/json")
-            .with(csrf())
             .content(objectMapper.writeValueAsString(request)))
                 .andDo(result -> System.out.println(result.getResponse().getContentAsString()))
             .andExpect(status().isOk())
@@ -126,7 +125,6 @@ public class AuthControllerTest {
 
         mockMvc.perform(post("/api/auth/signup")
                 .contentType("application/json")
-                        .with(csrf())
                 .content(objectMapper.writeValueAsString(request)))
                 .andDo(result -> System.out.println(result.getResponse().getContentAsString()))
                 .andExpect(status().isOk())
@@ -151,7 +149,6 @@ public class AuthControllerTest {
 
         mockMvc.perform(post("/api/auth/signup")
                 .contentType("application/json")
-                        .with(csrf())
                 .content(objectMapper.writeValueAsString(request)))
                 .andDo(result -> System.out.println(result.getResponse().getContentAsString()))
                 .andExpect(status().isOk())
@@ -172,7 +169,6 @@ public class AuthControllerTest {
 
         mockMvc.perform(post("/api/auth/signin")
                 .contentType("application/json")
-                        .with(csrf())
                 .content(objectMapper.writeValueAsString(request)))
                 .andDo(result -> System.out.println(result.getResponse().getContentAsString()))
                 .andExpect(status().isOk())
@@ -194,7 +190,6 @@ public class AuthControllerTest {
 
         mockMvc.perform(post("/api/auth/verifyEmail")
                 .contentType("application/json")
-                        .with(csrf())
                 .content(objectMapper.writeValueAsString(request)))
                 .andDo(result -> System.out.println(result.getResponse().getContentAsString()))
                 .andExpect(status().isOk())
@@ -214,7 +209,6 @@ public class AuthControllerTest {
 
         mockMvc.perform(post("/api/auth/resetPassword")
                 .contentType("application/json")
-                        .with(csrf())
                 .content(objectMapper.writeValueAsString(request)))
                 .andDo(result -> System.out.println(result.getResponse().getContentAsString()))
                 .andExpect(status().isOk())
@@ -236,7 +230,6 @@ public class AuthControllerTest {
 
         mockMvc.perform(post("/api/auth/refresh")
                 .contentType("application/json")
-                        .with(csrf())
                 .content(objectMapper.writeValueAsString(request)))
                 .andDo(result -> System.out.println(result.getResponse().getContentAsString()))
                 .andExpect(status().isOk())
