@@ -14,7 +14,6 @@ import com.enus.newsletter.model.request.auth.SignupRequest;
 import com.enus.newsletter.model.request.auth.VerifyViaEmailRequest;
 import com.enus.newsletter.model.request.keyword.RefreshTokenRequest;
 import com.enus.newsletter.model.response.Token;
-import com.enus.newsletter.model.response.VerifyViaEmail;
 import com.enus.newsletter.service.AuthService;
 import com.enus.newsletter.system.GeneralServerResponse;
 
@@ -65,14 +64,14 @@ public class AuthController {
     }
 
     @PostMapping("/verifyEmail")
-    public ResponseEntity<GeneralServerResponse<VerifyViaEmail>> verifyEmail(@Valid @RequestBody VerifyViaEmailRequest dto) {
-        VerifyViaEmail verification = authService.verifyEmail(dto);
+    public ResponseEntity<GeneralServerResponse<?>> verifyEmail(@Valid @RequestBody VerifyViaEmailRequest dto) {
+        authService.verifyEmail(dto);
         return ResponseEntity.ok(
                 new GeneralServerResponse<>(
                         false,
-                        "Successfully verified email",
+                        "Message sent to email for verification",
                         200,
-                        verification
+                        null
                 )
         );
     }
@@ -89,7 +88,6 @@ public class AuthController {
                 )
         );
     }
-
 
     @PostMapping("/refresh")
     public ResponseEntity<GeneralServerResponse<Token>> refresh(@Valid @RequestBody RefreshTokenRequest dto) {

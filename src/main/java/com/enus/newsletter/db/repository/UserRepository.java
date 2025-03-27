@@ -2,6 +2,8 @@ package com.enus.newsletter.db.repository;
 
 import com.enus.newsletter.db.AbsBaseRepository;
 
+import java.time.LocalDateTime;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
@@ -27,7 +29,9 @@ public class UserRepository extends AbsBaseRepository<UserEntity, IUserRepositor
     @PersistenceContext
     private EntityManager em;
 
-    public UserRepository(PasswordEncoder passwordEncoder, IUserRepository userRepository) {
+    public UserRepository(
+        PasswordEncoder passwordEncoder, 
+        IUserRepository userRepository) {
         super(userRepository);
         this.passwordEncoder = passwordEncoder;
     }
@@ -43,10 +47,7 @@ public class UserRepository extends AbsBaseRepository<UserEntity, IUserRepositor
     }
 
     public UserEntity createUser(SignupRequest dto) throws UserException {
-        if (repository.existsByUsername(dto.getUsername())) {
-            throw new UserException(UserErrorCode.USER_EXISTS, UserErrorCode.USER_EXISTS.getMessage());
-        }
-        if (repository.existsByEmail(dto.getEmail())) {
+        if (repository.existsByUsername(dto.getUsername()) || repository.existsByEmail(dto.getEmail())) {
             throw new UserException(UserErrorCode.USER_EXISTS, UserErrorCode.USER_EXISTS.getMessage());
         }
         try {
@@ -68,12 +69,6 @@ public class UserRepository extends AbsBaseRepository<UserEntity, IUserRepositor
             log.error("Failed to create user: {}", dto.getUsername(), e);
             throw new UserException(UserErrorCode.CREATE_USER_FAILED, e.getMessage());
         }
-    }
-
-    public UserEntity verifyEmail(String email) throws UserException {
-        UserEntity user = repository.findByEmail(email)
-                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
-        return repository.save(user);
     }
 
     public UserEntity findByUsername(String username) {
