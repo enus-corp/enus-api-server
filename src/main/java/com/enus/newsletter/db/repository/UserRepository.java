@@ -1,15 +1,14 @@
 package com.enus.newsletter.db.repository;
 
-import com.enus.newsletter.db.AbsBaseRepository;
-
-import java.time.LocalDateTime;
-
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Repository;
 
+import com.enus.newsletter.db.AbsBaseRepository;
 import com.enus.newsletter.db.entity.UserEntity;
 import com.enus.newsletter.db.repository.imp.IUserRepository;
 import com.enus.newsletter.enums.Gender;
+import com.enus.newsletter.exception.auth.AuthErrorCode;
+import com.enus.newsletter.exception.auth.AuthException;
 import com.enus.newsletter.exception.user.UserErrorCode;
 import com.enus.newsletter.exception.user.UserException;
 import com.enus.newsletter.model.request.auth.SignupRequest;
@@ -47,8 +46,11 @@ public class UserRepository extends AbsBaseRepository<UserEntity, IUserRepositor
     }
 
     public UserEntity createUser(SignupRequest dto) throws UserException {
-        if (repository.existsByUsername(dto.getUsername()) || repository.existsByEmail(dto.getEmail())) {
-            throw new UserException(UserErrorCode.USER_EXISTS, UserErrorCode.USER_EXISTS.getMessage());
+        if (repository.existsByUsername(dto.getUsername()) ) {
+            throw new AuthException(AuthErrorCode.USERNAME_ALREADY_EXISTS, AuthErrorCode.USERNAME_ALREADY_EXISTS.getMessage());
+        }
+        if (repository.existsByEmail(dto.getEmail())) {
+            throw new AuthException(AuthErrorCode.EMAIL_ALREADY_EXISTS, AuthErrorCode.EMAIL_ALREADY_EXISTS.getMessage());
         }
         try {
             log.info("Creating new user: {}", dto);
