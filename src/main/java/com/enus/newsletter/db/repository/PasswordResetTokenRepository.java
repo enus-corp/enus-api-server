@@ -1,10 +1,15 @@
 package com.enus.newsletter.db.repository;
 
+import java.time.LocalDateTime;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Repository;
+
 import com.enus.newsletter.db.AbsBaseRepository;
-import com.enus.newsletter.db.entity.OldPasswordHistoryEntity;
+import com.enus.newsletter.db.entity.PasswordHistoryEntity;
 import com.enus.newsletter.db.entity.PasswordResetTokenEntity;
 import com.enus.newsletter.db.entity.UserEntity;
-import com.enus.newsletter.db.repository.imp.IOldPasswordHistoryRepository;
+import com.enus.newsletter.db.repository.imp.IPasswordHistoryRepository;
 import com.enus.newsletter.db.repository.imp.IPasswordResetTokenRepository;
 import com.enus.newsletter.db.repository.imp.IUserRepository;
 import com.enus.newsletter.exception.auth.AuthErrorCode;
@@ -12,12 +17,9 @@ import com.enus.newsletter.exception.auth.AuthException;
 import com.enus.newsletter.exception.user.UserErrorCode;
 import com.enus.newsletter.exception.user.UserException;
 import com.enus.newsletter.model.request.auth.ResetPasswordRequest;
+
 import jakarta.transaction.Transactional;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Repository;
-
-import java.time.LocalDateTime;
 
 @Log4j2
 @Repository
@@ -25,18 +27,23 @@ import java.time.LocalDateTime;
 public class PasswordResetTokenRepository extends AbsBaseRepository<PasswordResetTokenEntity, IPasswordResetTokenRepository> {
     private final PasswordEncoder passwordEncoder;
     private final IUserRepository userRepository;
-    private final IOldPasswordHistoryRepository oldPasswordHistoryRepository;
+    private final IPasswordHistoryRepository passwordHistoryRepository;
 
-    public PasswordResetTokenRepository(PasswordEncoder passwordEncoder, IUserRepository userRepository, IPasswordResetTokenRepository passwordResetTokenRepository, IOldPasswordHistoryRepository oldPasswordHistoryRepository) {
+    public PasswordResetTokenRepository(PasswordEncoder passwordEncoder, IUserRepository userRepository, IPasswordResetTokenRepository passwordResetTokenRepository, IPasswordHistoryRepository passwordHistoryRepository) {
         super(passwordResetTokenRepository);
         this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
-        this.oldPasswordHistoryRepository = oldPasswordHistoryRepository;
+        this.passwordHistoryRepository = passwordHistoryRepository;
     }
 
     public void verifyEmail(String email, String resetPasswordCode) throws UserException {
         UserEntity user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+
+        // search for existing password reset tokens. invalidate prevoius tokens if exists
+
+
+        log.info("Reset Password Code -> {}", resetPasswordCode);
         
         PasswordResetTokenEntity otcEntity = new PasswordResetTokenEntity(
             user,
@@ -57,7 +64,7 @@ public class PasswordResetTokenRepository extends AbsBaseRepository<PasswordRese
         // send email
     }
 
-    public void resetPassword(ResetPasswordRequest dto) throws UserException {
+    public void resetPassword(ResetPasswordRequest dto) throws AuthException {
         // get record from password reset token
         PasswordResetTokenEntity resetToken = repository.findValidTokenByEmailCode(
                 dto.getVerificationCode(),
@@ -74,15 +81,15 @@ public class PasswordResetTokenRepository extends AbsBaseRepository<PasswordRese
         String newEncodedPassword = passwordEncoder.encode(dto.getNewPassword());
 
         // check if new password is same as old password
-        if(oldPasswordHistoryRepository.existsByUserIdAndEncodedPassword(user.getId(), newEncodedPassword)) {
+        if(passwordHistoryRepository.existsByUserIdAndPassword(user.getId(), newEncodedPassword)) {
             throw new AuthException(AuthErrorCode.PASSWORD_ALREADY_USED, AuthErrorCode.PASSWORD_ALREADY_USED.getMessage());
         }
-        OldPasswordHistoryEntity oldPasswordHistoryEntity = new OldPasswordHistoryEntity(user.getId(), newEncodedPassword);
+        PasswordHistoryEntity passwordHistoryEntity = new PasswordHistoryEntity(user, newEncodedPassword);
         // update password in user entity
         user.resetPassword(newEncodedPassword);
 
         // Add new password to password history
-        oldPasswordHistoryRepository.save(oldPasswordHistoryEntity);
+        passwordHistoryRepository.save(passwordHistoryEntity);
         // save/update user password
         userRepository.save(user);
         // delete verification token
