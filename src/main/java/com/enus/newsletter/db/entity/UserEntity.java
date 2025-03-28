@@ -100,6 +100,12 @@ public class UserEntity extends BaseEntity {
     @OneToMany(mappedBy ="user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ChatSessionEntity> chatSessions = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<PasswordHistoryEntity> passwordHistories = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<PasswordResetTokenEntity> passwordResetTokens = new ArrayList<>();
+
 //    @ElementCollection
 //    @CollectionTable(name="roles", joinColumns = @JoinColumn(name="user_id", nullable = false))
 //    @Column(name= "role", nullable = false, length = 50)
