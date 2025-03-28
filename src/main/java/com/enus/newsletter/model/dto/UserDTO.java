@@ -20,7 +20,6 @@ public class UserDTO implements UserDetails {
     private final String username;
     private final String password;
     private final String email;
-//    private final Collection<? extends GrantedAuthority> authorities;
 
     public UserDTO(UserEntity user) {
         this.userId = user.getId();
@@ -30,9 +29,6 @@ public class UserDTO implements UserDetails {
         this.password = user.getPassword();
         this.email = user.getEmail();
 
-//        this.authorities = user.getHasRole().stream()
-//                .map(role -> (GrantedAuthority) () -> role)
-//                .collect(Collectors.toList());
     }
 
     @Override

@@ -1,25 +1,22 @@
 package com.enus.newsletter.config;
 
-import com.enus.newsletter.model.dto.UserDTO;
+import com.enus.newsletter.service.UserDetailsServiceImpl;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.enus.newsletter.db.repository.imp.IUserRepository;
-
 @Configuration
 public class ApplicationConfig {
-    private final IUserRepository userRepository;
+    private final UserDetailsServiceImpl userDetailsService;
 
-    public ApplicationConfig(IUserRepository userRepository) {
-        this.userRepository = userRepository;
+    public ApplicationConfig(UserDetailsServiceImpl userDetailsService) {
+        this.userDetailsService = userDetailsService;
     }
 
     @Bean
@@ -28,20 +25,10 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
-        return username -> {
-            return userRepository.findByUsername(username)
-                    .map(UserDTO::new)
-                    .orElseThrow(() -> {
-                        return new UsernameNotFoundException("User not found");
-                    });
-        };
-    }
-
-    @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService());
+        // set custom user details service and password encoder to Authentication Provider
+        provider.setUserDetailsService(userDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }
