@@ -12,6 +12,8 @@ public enum AuthErrorCode implements IErrorCode {
     ACCOUNT_DISABLED(1006, "Account disabled"),
     INVALID_RESET_PASSWORD_TOKEN(1007, "Invalid reset password token"),
     PASSWORD_ALREADY_USED(1008, "Password already used"),
+    USERNAME_ALREADY_EXISTS(1009, "Username already exists"),
+    EMAIL_ALREADY_EXISTS(1010, "Email already exists"),
     ;
 
 
