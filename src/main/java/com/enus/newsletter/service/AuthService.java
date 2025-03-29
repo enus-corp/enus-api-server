@@ -5,6 +5,16 @@
 
 package com.enus.newsletter.service;
 
+import java.util.Random;
+
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
+
 import com.enus.newsletter.db.entity.UserEntity;
 import com.enus.newsletter.db.repository.LoginHistoryRepository;
 import com.enus.newsletter.db.repository.PasswordResetTokenRepository;
@@ -19,16 +29,8 @@ import com.enus.newsletter.model.request.auth.SignupRequest;
 import com.enus.newsletter.model.request.auth.VerifyViaEmailRequest;
 import com.enus.newsletter.model.request.keyword.RefreshTokenRequest;
 import com.enus.newsletter.model.response.Token;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.LockedException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
 
-import java.util.Random;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j(topic = "AUTH_SERVICE")
 @Service
@@ -99,8 +101,6 @@ public class AuthService {
             );
 
             throw new AuthException(AuthErrorCode.INVALID_CREDENTIALS, "Authentication failed. Invalid username or password");
-        } finally {
-            log.info("Authentication attempt failed for user: {}", dto);
         }
 
         // get authenticated user details from the authentication result
