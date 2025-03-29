@@ -92,9 +92,9 @@ springdoc:
 
 # Logging
 logging.level.org.springframework: info
-logging.level.org.springframework.security: trace
+logging.level.org.springframework.security: debug
 
 # JWT
 jwt.security.secret-key: ${JWT_SECRET_KEY}
-jwt.security.access-token.expiration: 900000 # 15 Minutes
+jwt.security.access-token.expiration: 3600000 # 15 Minutes
 jwt.security.refresh-token.expiration: 604800000 # 7 Days
