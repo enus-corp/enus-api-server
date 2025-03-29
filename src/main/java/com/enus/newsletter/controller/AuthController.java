@@ -35,7 +35,6 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<GeneralServerResponse<UserEntity>> signup(@Valid @RequestBody SignupRequest dto) {
-        log.info("---------------- Signup request: {} ----------------", dto);
         UserEntity user = authService.signup(dto);
         GeneralServerResponse<UserEntity> response = new GeneralServerResponse<>(
             false,
@@ -43,14 +42,11 @@ public class AuthController {
             200,
             user
         );
-
-        log.info("---------------- Signup response: {} ----------------", response);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/signin")
     public ResponseEntity<GeneralServerResponse<Token>> signin(HttpServletRequest request, @Valid @RequestBody SigninRequest dto) {
-        log.info("\t >>> Signin Request");
         String ip = request.getHeader("X-FORWARDED-FOR");
         ip = ip != null ? ip.split(",")[0] : request.getRemoteAddr();
         Token token = authService.authenticate(dto, ip);
