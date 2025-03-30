@@ -35,12 +35,9 @@ public class LogInterceptor implements HandlerInterceptor {
                 ==================== Request Log ====================
                 Request URL: {}
                 Request Method: {}
-                Request Headers: {}
-                Handler: {}
                 =====================================================
-                \n\n
                 """,
-                request.getRequestURL(), request.getMethod(), getHeadersAsString(request), handler);
+                request.getRequestURL(), request.getMethod());
 
         return true;
     }
@@ -52,11 +49,9 @@ public class LogInterceptor implements HandlerInterceptor {
                 ==================== Response Log ====================
                 Response Status: {}
                 Response Headers: {}
-                ModelAndView: {}
                 =====================================================
-                \n\n
                 """,
-                response.getStatus(), getResponseHeadersAsString(response), modelAndView);
+                response.getStatus(), getResponseHeadersAsString(response));
     }
 
     @Override
@@ -69,7 +64,6 @@ public class LogInterceptor implements HandlerInterceptor {
                 Response Status: {}
                 Exception: {}
                 ==============================================================
-                \n\n
                 """,
                 request.getRequestURL(), request.getMethod(), response.getStatus(), ex);
     }
