@@ -11,6 +11,9 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 
 import com.enus.newsletter.model.dto.ChatMessage;
@@ -33,16 +36,21 @@ public class ChatController {
     // TODO. Have to set config to get @AuthenticationPrincipal
     @MessageMapping("/request-chat-id")
     @SendToUser("/queue/chat")
-    public Map<String, String> requestChatId(
-        Message<?> message) {
-        log.info("Received request for chat id");
+    public Map<String, String> requestChatId(Message<?> message) {
+        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+        String sesionId = accessor.getSessionId();
+
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        log.info("Session ID: {}", sesionId);
+        // log.info("Message: {}", message);
+        // log.info("Message Header: {}", message.getHeaders());
+
         String chatId = UUID.randomUUID().toString();
 
         Map<String, String> sessionInfo = new HashMap<>();
         sessionInfo.put("chatId", chatId);
         sessionInfo.put("timestamp", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-        long mockUserId = 2;
-        chatService.saveChatSessionId(chatId, mockUserId);
+        // chatService.saveChatSessionId(chatId, currentUser.getUserId());
         log.info("Sending session info: {}", sessionInfo);
         return sessionInfo;
     }
