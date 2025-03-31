@@ -15,6 +15,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.enus.newsletter.system.GeneralServerResponse;
+import com.mongodb.lang.NonNull;
 
 import lombok.extern.slf4j.Slf4j;
 

@@ -1,7 +1,6 @@
 package com.enus.newsletter.exception.keyword;
 
 import com.enus.newsletter.exception.CustomBaseException;
-import com.enus.newsletter.exception.IErrorCode;
 
 public class KeywordException extends CustomBaseException {
     public KeywordException(KeywordErrorCode errorCode) { super(errorCode); }

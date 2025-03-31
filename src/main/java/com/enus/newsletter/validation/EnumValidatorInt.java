@@ -40,7 +40,6 @@ public class EnumValidatorInt implements ConstraintValidator<ValidEnum, Integer>
         // Check if the integer value matches any enum ordinal value
         Enum<?>[] constants = enumClass.getEnumConstants();
         log.info("Enum class: {}", enumClass);
-        log.info("Enum constants: {}", constants);
         log.info("Enum value: {}", value);
         log.info("Valid values: {}", validValues);
 
