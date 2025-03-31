@@ -15,7 +15,7 @@ public class ArticleEntity extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, name = "article_id")
+    @Column(nullable = false, name = "article_id", unique = true)
     private String articleId;
 
     @Column(nullable = false, name = "media_code")
