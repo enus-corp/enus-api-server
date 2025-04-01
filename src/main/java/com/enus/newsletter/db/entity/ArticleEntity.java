@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Table(name = "articles")
@@ -21,13 +22,13 @@ public class ArticleEntity extends BaseEntity{
     @Column(nullable = false, name = "media_code")
     private String mediaCode;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "title")
     private String title;
 
     @Column(nullable = false, name = "summary", columnDefinition = "TEXT")
     private String summary;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
+    @Column(nullable = false, name = "content", columnDefinition = "TEXT")
     private String content;
 
     @Column(nullable = false, name = "section_code")
@@ -38,4 +39,12 @@ public class ArticleEntity extends BaseEntity{
 
     @Column(nullable = false, name = "publish_date")
     private LocalDateTime publishDate;
+
+    @ManyToMany
+    @JoinTable(
+        name = "article_summarize_article", // name of join table
+        joinColumns = @JoinColumn(name = "article_id"), // name of column in this table
+        inverseJoinColumns = @JoinColumn(name = "summarized_article_id") // name of column in the join table
+    )
+    private Set<SummarizedArticleEntity> summarizedArticles;
 }
