@@ -1,11 +1,14 @@
 package com.enus.newsletter.db.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
 @Entity
 @Table(name="user_keywords")
-@Data
+@Getter
+@Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class UserKeywordEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

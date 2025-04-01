@@ -10,7 +10,7 @@ import java.util.Set;
 @Table(name="keywords")
 @Getter
 @Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class KeywordEntity extends BaseEntity{
     @Id
@@ -22,8 +22,5 @@ public class KeywordEntity extends BaseEntity{
 
     @OneToMany(mappedBy = "keyword")
     private Set<UserKeywordEntity> users;
-
-//    @OneToMany(mappedBy = "keyword")
-//    private Set<ArticleKeywordEntity> articles;
 
 }

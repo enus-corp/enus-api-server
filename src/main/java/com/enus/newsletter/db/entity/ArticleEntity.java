@@ -9,6 +9,7 @@ import java.util.Set;
 @Entity
 @Table(name = "articles")
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class ArticleEntity extends BaseEntity{
