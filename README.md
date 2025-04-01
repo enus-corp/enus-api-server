@@ -38,3 +38,8 @@
 - `.gradelw bootJar`
 - copy the jar file from `build/libs` to the server (Home directory)
 - run the jar file: `java -jar <jar file name>`
+
+
+### API
+---
+- API Documentation: http://localhost:8080/swagger-ui/index.html
