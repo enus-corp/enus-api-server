@@ -10,6 +10,12 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class UserKeywordEntity{
+    public UserKeywordEntity(UserEntity user, KeywordEntity keyword, boolean notificationEnabled) {
+        this.user = user;
+        this.keyword = keyword;
+        this.notificationEnabled = notificationEnabled;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

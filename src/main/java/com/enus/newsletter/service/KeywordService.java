@@ -54,8 +54,7 @@ public class KeywordService{
 
         KeywordEntity keyword = keywordRepository.findByWord(req.getWord())
                 .orElseGet(() -> {
-                    KeywordEntity newKeyword = new KeywordEntity();
-                    newKeyword.setWord(req.getWord());
+                    KeywordEntity newKeyword = new KeywordEntity(req.getWord());
                     return keywordRepository.save(newKeyword);
                 });
 
@@ -64,10 +63,7 @@ public class KeywordService{
             throw new KeywordException(KeywordErrorCode.KEYWORD_ALREADY_EXISTS, KeywordErrorCode.KEYWORD_ALREADY_EXISTS.getMessage());
         }
 
-        UserKeywordEntity userKeyword  = new UserKeywordEntity();
-        userKeyword.setUser(user);
-        userKeyword.setKeyword(keyword);
-        userKeyword.setNotificationEnabled(req.isNotificationEnabled());
+        UserKeywordEntity userKeyword  = new UserKeywordEntity(user, keyword, req.isNotificationEnabled());
         userKeywordRepository.save(userKeyword);
 
         return KeywordDTO.builder()
@@ -87,17 +83,13 @@ public class KeywordService{
                 .map(k -> {
                     KeywordEntity keyword = keywordRepository.findByWord(k.getWord())
                             .orElseGet(() -> {
-                                KeywordEntity newKeyword = new KeywordEntity();
-                                newKeyword.setWord(k.getWord());
+                                KeywordEntity newKeyword = new KeywordEntity(k.getWord());
                                 return keywordRepository.save(newKeyword);
                             });
 
                     // skip if user already has the keyword
                     if (!userKeywordRepository.existsByUserAndKeyword(user, keyword)) {
-                        UserKeywordEntity userKeyword = new UserKeywordEntity();
-                        userKeyword.setUser(user);
-                        userKeyword.setKeyword(keyword);
-                        userKeyword.setNotificationEnabled(k.isNotificationEnabled());
+                        UserKeywordEntity userKeyword = new UserKeywordEntity(user, keyword, k.isNotificationEnabled());
                         userKeywordRepository.save(userKeyword);
                     }
 

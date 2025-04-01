@@ -7,8 +7,13 @@ import lombok.*;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 public class LoginHistoryEntity extends BaseEntity{
+    public LoginHistoryEntity(String username, String ipAddress, int loginStatus, String reason) {
+        this.username = username;
+        this.ipAddress = ipAddress;
+        this.loginStatus = loginStatus;
+        this.reason = reason;
+    }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)

@@ -18,14 +18,11 @@ public class LoginHistoryRepository extends AbsBaseRepository<LoginHistoryEntity
 
     public void saveLoginHistory(String username, String ipAddress, int status, String reason) {
         // create a record in the login history table
-        LoginHistoryEntity loginHistory = LoginHistoryEntity
-                .builder()
-                .username(username)
-                .ipAddress(ipAddress)
-                .loginStatus(status)
-                .reason(reason)
-                .build();
-
-        repository.save(loginHistory);
+        LoginHistoryEntity loginHistoryEntity = new LoginHistoryEntity(
+            username, 
+            ipAddress, 
+            status, 
+            reason);
+        repository.save(loginHistoryEntity);
     }
 }

@@ -11,8 +11,10 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 public class KeywordEntity extends BaseEntity{
+    public KeywordEntity(String word) {
+        this.word = word;
+    }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
