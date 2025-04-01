@@ -1,3 +1,7 @@
 databaseChangeLog:
+  # - includeAll:
+  #     path: db/changelog/2025/02
+  # - includeAll:
+  #     path: db/changelog/2025/03
   - includeAll:
-      path: db/changelog/2025/03
+      path: db/changelog/2025/04
