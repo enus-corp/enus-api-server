@@ -2,7 +2,9 @@ package com.enus.newsletter.config;
 
 import java.util.List;
 
+import com.enus.newsletter.handler.OAuth2SuccessHandler;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -10,7 +12,13 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.config.oauth2.client.CommonOAuth2Provider;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -27,13 +35,17 @@ import lombok.extern.log4j.Log4j2;
 public class SecurityConfig {
     private final AuthenticationProvider authenticationProvider;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final ClientRegistrationRepository clientRegistrationRepository;
+    private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
     public SecurityConfig(
             @Qualifier("authenticationProvider") AuthenticationProvider authenticationProvider,
-            JwtAuthenticationFilter jwtAuthenticationFilter
+            JwtAuthenticationFilter jwtAuthenticationFilter, ClientRegistrationRepository clientRegistrationRepository, OAuth2SuccessHandler oAuth2SuccessHandler
     ) {
         this.authenticationProvider = authenticationProvider;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.clientRegistrationRepository = clientRegistrationRepository;
+        this.oAuth2SuccessHandler = oAuth2SuccessHandler;
     }
 
     @Bean
@@ -48,8 +60,12 @@ public class SecurityConfig {
 
         return http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(csrf -> csrf.disable())
-                .oauth2Login(Customizer.withDefaults()) // add OAuth2LoginAuthenticationFilter
+                .csrf(AbstractHttpConfigurer::disable)
+                .oauth2Login(config ->
+                        config
+                                .clientRegistrationRepository(clientRegistrationRepository)
+                                .successHandler(oAuth2SuccessHandler)
+                ) // add OAuth2LoginAuthenticationFilter
                 // .oauth2Login(config ->
                 //         config
                 //                 .successHandler(oAuth2SuccessHandler)
