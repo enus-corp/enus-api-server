@@ -63,8 +63,10 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .oauth2Login(config ->
                         config
-                                .clientRegistrationRepository(clientRegistrationRepository)
+//                                .clientRegistrationRepository(clientRegistrationRepository)
                                 .successHandler(oAuth2SuccessHandler)
+                                .authorizationEndpoint(authorizationEndpointConfig -> authorizationEndpointConfig.baseUri("/oauth2/authorization"))
+                                .redirectionEndpoint(redirectionEndpointConfig -> redirectionEndpointConfig.baseUri("/login/oauth2/code/*"))
                 ) // add OAuth2LoginAuthenticationFilter
                 // .oauth2Login(config ->
                 //         config
