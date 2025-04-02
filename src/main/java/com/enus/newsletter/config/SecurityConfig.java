@@ -35,7 +35,6 @@ import lombok.extern.log4j.Log4j2;
 public class SecurityConfig {
     private final AuthenticationProvider authenticationProvider;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final ClientRegistrationRepository clientRegistrationRepository;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
     public SecurityConfig(
@@ -44,7 +43,6 @@ public class SecurityConfig {
     ) {
         this.authenticationProvider = authenticationProvider;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-        this.clientRegistrationRepository = clientRegistrationRepository;
         this.oAuth2SuccessHandler = oAuth2SuccessHandler;
     }
 
@@ -63,17 +61,10 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .oauth2Login(config ->
                         config
-//                                .clientRegistrationRepository(clientRegistrationRepository)
                                 .successHandler(oAuth2SuccessHandler)
                                 .authorizationEndpoint(authorizationEndpointConfig -> authorizationEndpointConfig.baseUri("/oauth2/authorization"))
                                 .redirectionEndpoint(redirectionEndpointConfig -> redirectionEndpointConfig.baseUri("/login/oauth2/code/*"))
                 ) // add OAuth2LoginAuthenticationFilter
-                // .oauth2Login(config ->
-                //         config
-                //                 .successHandler(oAuth2SuccessHandler)
-                //                 .failureHandler(oAuth2FailHandler)
-                //                 .userInfoEndpoint(userEndpointConfig -> userEndpointConfig.userService(customOAuth2UserService))
-                //         )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                                 .requestMatchers(
