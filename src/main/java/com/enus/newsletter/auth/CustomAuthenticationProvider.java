@@ -32,7 +32,6 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 
         CustomUserDetailsImpl userDetailsImpl = (CustomUserDetailsImpl) userDetailsService.loadUserByUsername(email);
 
-        log.info("----Breakpoint 1----");
         if (passwordEncoder.matches(password, userDetailsImpl.getPassword())) {
             return new EmailPasswordAuthenticationToken(userDetailsImpl, password);
         } else {
