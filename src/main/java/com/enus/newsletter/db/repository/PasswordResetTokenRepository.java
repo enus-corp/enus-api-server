@@ -40,11 +40,14 @@ public class PasswordResetTokenRepository extends AbsBaseRepository<PasswordRese
         UserEntity user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
+        log.info("oauth user status -> {}", user.isOauthUser());
+        
+        if (user.isOauthUser()) {
+            throw new UserException(UserErrorCode.RESTRICTED_ACTION, "User is not allowed to change password");
+
+        }
         // search for existing password reset tokens. invalidate prevoius tokens if exists
 
-
-        log.info("Reset Password Code -> {}", resetPasswordCode);
-        
         PasswordResetTokenEntity otcEntity = new PasswordResetTokenEntity(
             user,
             resetPasswordCode,
