@@ -28,11 +28,18 @@ public class UserRepository extends AbsBaseRepository<UserEntity, IUserRepositor
     @PersistenceContext
     private EntityManager em;
 
-    public UserRepository(
-        PasswordEncoder passwordEncoder, 
-        IUserRepository userRepository) {
+    public UserRepository(PasswordEncoder passwordEncoder, IUserRepository userRepository) {
         super(userRepository);
         this.passwordEncoder = passwordEncoder;
+    }
+
+    public boolean existsByEmail(String email) {
+        return repository.existsByEmail(email);
+    }
+
+    public UserEntity findByEmail(String email) {
+        return repository.findByEmail(email)
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
     }
 
     public UserEntity findUserById(Long id) {
@@ -63,7 +70,7 @@ public class UserRepository extends AbsBaseRepository<UserEntity, IUserRepositor
                     dto.getEmail(),
                     Gender.valueOf(dto.getGender()),
                     dto.getAge(),
-                    true
+                    false
             );
 
             return repository.save(user);
