@@ -4,17 +4,13 @@ import java.util.List;
 
 import com.enus.newsletter.handler.OAuth2SuccessHandler;
 import com.enus.newsletter.service.CustomUserDetailsServiceImpl;
-
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
@@ -83,11 +79,7 @@ public class SecurityConfig {
                                         "/swagger-ui/**",
                                         "/v3/api-docs/**",
                                         // Authentication
-                                        "/api/auth/signup",
-                                        "/api/auth/signin",
-                                        "/api/auth/refresh",
-                                        "/api/auth/verifyEmail",
-                                        "/api/auth/resetPassword",
+                                        "/api/auth/**",
                                         // Error
                                         "/error",
                                         "/ws/**"
