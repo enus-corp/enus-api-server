@@ -1,11 +1,11 @@
 package com.enus.newsletter.model.dto;
 
-import com.enus.newsletter.db.entity.UserEntity;
+import com.enus.newsletter.interfaces.ICustomUserDetails;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
@@ -13,23 +13,14 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @Builder
-public class UserDTO implements UserDetails {
+public class UserDTO implements ICustomUserDetails {
     private final Long userId;
     private final String firstName;
     private final String lastName;
     private final String username;
     private final String password;
     private final String email;
-
-    public UserDTO(UserEntity user) {
-        this.userId = user.getId();
-        this.firstName = user.getFirstName();
-        this.lastName = user.getLastName();
-        this.username = user.getUsername();
-        this.password = user.getPassword();
-        this.email = user.getEmail();
-
-    }
+    private final boolean isOauthUser;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
