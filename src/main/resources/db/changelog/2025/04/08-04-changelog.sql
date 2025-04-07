@@ -1,0 +1,2 @@
+ALTER TABLE password_reset_tokens
+DROP COLUMN response_code
