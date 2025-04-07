@@ -4,7 +4,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -14,7 +13,12 @@ import org.springframework.stereotype.Component;
 
 import com.enus.newsletter.db.entity.UserEntity;
 import com.enus.newsletter.db.repository.UserRepository;
+import com.enus.newsletter.interfaces.CustomUserDetailsImpl;
+import com.enus.newsletter.model.dto.UserDTO;
+import com.enus.newsletter.model.response.Token;
 import com.enus.newsletter.service.JwtService;
+import com.enus.newsletter.system.GeneralServerResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 
@@ -52,25 +56,49 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 firstName = oAuth2User.getAttribute("given_name");
                 username = oAuth2User.getAttribute("sub");
 
-                UserEntity user = UserEntity.builder()
-                    .email(email)
-                    .username(username)
-                    .firstName(firstName)
-                    .lastName(lastName)
-                    .isOauthUser(true)
-                    .build(); 
-
-                userRepository.save(user);
-                
                 break;
         
             default:
                 break;
         }
 
+        Boolean userExists = userRepository.existsByEmail(email);
 
-        super.onAuthenticationSuccess(request, response, authentication);
-//         response.sendRedirect("/websocket-client.html");
+        UserEntity userEntity = null;
+        if (!userExists) {
+            log.info("User not found, creating new user");
+            userEntity = UserEntity.builder()
+                    .email(email)
+                    .username(username)
+                    .firstName(firstName)
+                    .lastName(lastName)
+                    .isOauthUser(true)
+                    .build();
+
+            userRepository.save(userEntity);
+        } 
+
+        // Generate JWT token
+        UserDTO user = UserDTO.builder()
+            .email(email)
+            .isOauthUser(true)
+            .build(); 
+
+        String accessToken = jwtService.generateAccessToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+
+
+        // super.onAuthenticationSuccess(request, response, authentication);
+        GeneralServerResponse<Token> responseBody = new GeneralServerResponse<Token>(
+            false,
+            "Successfully authenticated user",
+            200,
+            Token.builder().accessToken(accessToken).refreshToken(refreshToken).build()
+        );
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(new ObjectMapper().writeValueAsString(responseBody));
     }
 
 }
