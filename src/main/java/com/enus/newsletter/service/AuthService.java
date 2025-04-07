@@ -137,11 +137,11 @@ public class AuthService {
     }
 
     public Token refreshToken(RefreshTokenRequest dto) throws UserException, AuthException {
-        String username = jwtService.extractEmail(dto.getRefreshToken());
-        if (username == null) {
+        String email = jwtService.extractEmail(dto.getRefreshToken());
+        if (email == null) {
             throw new AuthException(AuthErrorCode.INVALID_TOKEN, AuthErrorCode.INVALID_TOKEN.getMessage());
         }
-        UserEntity user = userRepository.findByUsername(username);
+        UserEntity user = userRepository.findByEmail(email);
         ICustomUserDetails userDetails = new CustomUserDetailsImpl(user);
 
         if (jwtService.isTokenValid(dto.getRefreshToken(), userDetails)) {
