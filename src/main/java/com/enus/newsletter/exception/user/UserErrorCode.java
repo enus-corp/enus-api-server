@@ -7,6 +7,7 @@ public enum UserErrorCode implements IErrorCode {
     INVALID_USER_DATA(2002, "Invalid User Data"),
     USER_EXISTS(2003, "User Already Exists"),
     CREATE_USER_FAILED(2004, "Create User Failed"),
+    RESTRICTED_ACTION(2005, "Restricted Action")
     ;
 
     private final int code;

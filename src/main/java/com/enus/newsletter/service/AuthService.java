@@ -10,11 +10,10 @@ import java.util.Random;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import com.enus.newsletter.auth.EmailPasswordAuthenticationToken;
 import com.enus.newsletter.db.entity.UserEntity;
 import com.enus.newsletter.db.repository.LoginHistoryRepository;
 import com.enus.newsletter.db.repository.PasswordResetTokenRepository;
@@ -22,7 +21,8 @@ import com.enus.newsletter.db.repository.UserRepository;
 import com.enus.newsletter.exception.auth.AuthErrorCode;
 import com.enus.newsletter.exception.auth.AuthException;
 import com.enus.newsletter.exception.user.UserException;
-import com.enus.newsletter.model.dto.UserDTO;
+import com.enus.newsletter.interfaces.CustomUserDetailsImpl;
+import com.enus.newsletter.interfaces.ICustomUserDetails;
 import com.enus.newsletter.model.request.auth.ResetPasswordRequest;
 import com.enus.newsletter.model.request.auth.SigninRequest;
 import com.enus.newsletter.model.request.auth.SignupRequest;
@@ -59,7 +59,7 @@ public class AuthService {
         log.info("Processing authentication for user: {}", dto);
 
         // Get user credentials
-        Authentication auth = new UsernamePasswordAuthenticationToken(dto.getUsername(), dto.getPassword());
+        Authentication auth = new EmailPasswordAuthenticationToken(dto.getEmail(), dto.getPassword());
         Authentication authResult;
 
         try {
@@ -68,10 +68,10 @@ public class AuthService {
             authResult = authenticationManager.authenticate(auth);
 
         } catch (LockedException e) {
-            userRepository.handleLoginAttempt(dto.getUsername(), false);
+            userRepository.handleLoginAttempt(dto.getEmail(), false);
 
             loginHistoryRepository.saveLoginHistory(
-                    dto.getUsername(),
+                    dto.getEmail(),
                     ip,
                     0,
                     "Authentication failed. Account is locked"
@@ -79,10 +79,10 @@ public class AuthService {
 
             throw new AuthException(AuthErrorCode.ACCOUNT_LOCKED, "Authentication failed. Account is locked");
         } catch (DisabledException e) {
-            userRepository.handleLoginAttempt(dto.getUsername(), false);
+            userRepository.handleLoginAttempt(dto.getEmail(), false);
 
             loginHistoryRepository.saveLoginHistory(
-                    dto.getUsername(),
+                    dto.getEmail(),
                     ip,
                     0,
                     "Authentication failed. Account is disabled"
@@ -91,10 +91,10 @@ public class AuthService {
             throw new AuthException(AuthErrorCode.ACCOUNT_DISABLED, "Authentication failed. Account is disabled");
         } catch (Exception e) {
             log.error("Authentication failed for user: {}", e.getMessage());
-            userRepository.handleLoginAttempt(dto.getUsername(), false);
+            userRepository.handleLoginAttempt(dto.getEmail(), false);
 
             loginHistoryRepository.saveLoginHistory(
-                    dto.getUsername(),
+                    dto.getEmail(),
                     ip,
                     0,
                     "Authentication failed. Invalid username or password"
@@ -104,13 +104,13 @@ public class AuthService {
         }
 
         // get authenticated user details from the authentication result
-        UserDetails user = (UserDetails) authResult.getPrincipal();
+        ICustomUserDetails user = (ICustomUserDetails) authResult.getPrincipal();
 
         // reset login attempts
-        userRepository.handleLoginAttempt(dto.getUsername(), true);
+        userRepository.handleLoginAttempt(dto.getEmail(), true);
         // save login history
         loginHistoryRepository.saveLoginHistory(
-                dto.getUsername(),
+                dto.getEmail(),
                 ip,
                 1,
                 "Authentication successful"
@@ -137,15 +137,15 @@ public class AuthService {
     }
 
     public Token refreshToken(RefreshTokenRequest dto) throws UserException, AuthException {
-        String username = jwtService.extractUsername(dto.getRefreshToken());
-        if (username == null) {
+        String email = jwtService.extractEmail(dto.getRefreshToken());
+        if (email == null) {
             throw new AuthException(AuthErrorCode.INVALID_TOKEN, AuthErrorCode.INVALID_TOKEN.getMessage());
         }
-        UserEntity user = userRepository.findByUsername(username);
-        UserDTO userDTO = new UserDTO(user);
+        UserEntity user = userRepository.findByEmail(email);
+        ICustomUserDetails userDetails = new CustomUserDetailsImpl(user);
 
-        if (jwtService.isTokenValid(dto.getRefreshToken(), userDTO)) {
-            String accessToken = jwtService.generateAccessToken(userDTO);
+        if (jwtService.isTokenValid(dto.getRefreshToken(), userDetails)) {
+            String accessToken = jwtService.generateAccessToken(userDetails);
 
             return Token
                     .builder()

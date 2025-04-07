@@ -1,28 +1,27 @@
 package com.enus.newsletter.service;
 
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.enus.newsletter.db.entity.UserEntity;
 import com.enus.newsletter.db.repository.imp.IUserRepository;
-import com.enus.newsletter.model.dto.UserDTO;
+import com.enus.newsletter.interfaces.CustomUserDetailsImpl;
 
 @Service
-public class UserDetailsServiceImpl implements UserDetailsService{
+public class CustomUserDetailsServiceImpl implements UserDetailsService{
 
     private final IUserRepository userRepository;
 
-    public UserDetailsServiceImpl(IUserRepository userRepository) {
+    public CustomUserDetailsServiceImpl(IUserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
+    // TODO. Should use use user not found exception
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserDTO user = userRepository.findByUsername(username)
-                .map(UserDTO::new)
+    public CustomUserDetailsImpl loadUserByUsername(String email) throws UsernameNotFoundException {
+        UserEntity user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-        return user;
+        return new CustomUserDetailsImpl(user);
     }
-    
 }

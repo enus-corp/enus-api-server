@@ -33,6 +33,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Builder
 public class UserEntity extends BaseEntity {
 
     public UserEntity(
@@ -42,7 +43,8 @@ public class UserEntity extends BaseEntity {
             @NotBlank @Size(max = 100) String password,
             @NotBlank @Size(max = 100) @Email String email,
             @NotBlank Gender gender,
-            @NotBlank int age
+            @NotBlank int age,
+            boolean isOauthUser
     ) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -51,22 +53,23 @@ public class UserEntity extends BaseEntity {
         this.password = password;
         this.gender = gender;
         this.age = age;
+        this.isOauthUser = isOauthUser;
     }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
     private Long id;
 
-    @Column(nullable = false, length=20, name = "first_name")
+    @Column(nullable = true, length=20, name = "first_name")
     private String firstName;
 
-    @Column(nullable = false, length=20, name = "last_name")
+    @Column(nullable = true, length=20, name = "last_name")
     private String lastName;
 
-    @Column(nullable = false, unique = true, length=20)
+    @Column(nullable = true, unique = true, length=255)
     private String username;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String password;
 
     @Column(nullable = false, length = 100)
@@ -74,11 +77,14 @@ public class UserEntity extends BaseEntity {
     private String email;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, name = "gender", columnDefinition = "VARCHAR(10)")
+    @Column(nullable = true, name = "gender", columnDefinition = "VARCHAR(10)")
     private Gender gender;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private int age;
+
+    @Column(nullable = false, name = "is_oauth_user")
+    private boolean isOauthUser;
 
     @Column(nullable = false, name = "is_expired", columnDefinition = "smallint default 0")
     private short isExpired;

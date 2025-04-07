@@ -6,8 +6,9 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+
+import com.enus.newsletter.interfaces.ICustomUserDetails;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -34,21 +35,21 @@ public class JwtService {
     * */
 
     // Entry point
-    public String generateAccessToken(UserDetails userDetails) {
+    public String generateAccessToken(ICustomUserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("type", "ACCESS");
         claims.put("role", userDetails.getAuthorities());
         return buildToken(claims, userDetails, accessTokenExpiration);
     }
 
-    public String generateRefreshToken(UserDetails userDetails) {
+    public String generateRefreshToken(ICustomUserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("type", "REFRESH");
         claims.put("jti", UUID.randomUUID().toString());
         return buildToken(claims, userDetails, refreshTokenExpiration);
     }
 
-    public String extractUsername(String token) {
+    public String extractEmail(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 
@@ -62,9 +63,9 @@ public class JwtService {
         return accessTokenExpiration;
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    public boolean isTokenValid(String token, ICustomUserDetails userDetails) {
+        final String email = extractEmail(token);
+        return (email.equals(userDetails.getEmail()) && !isTokenExpired(token));
     }
 
     /*
@@ -75,13 +76,13 @@ public class JwtService {
 
     private String buildToken(
             Map<String, Object> extraClaims,
-            UserDetails userDetails,
+            ICustomUserDetails userDetails,
             long expiration
     ) {
         return Jwts
                 .builder()
                 .claims(extraClaims)
-                .subject(userDetails.getUsername())
+                .subject(userDetails.getEmail())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSignInKey())

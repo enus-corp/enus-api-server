@@ -15,6 +15,8 @@ import org.springframework.stereotype.Component;
 
 import com.enus.newsletter.exception.auth.AuthErrorCode;
 import com.enus.newsletter.exception.auth.AuthException;
+import com.enus.newsletter.interfaces.CustomUserDetailsImpl;
+import com.enus.newsletter.service.CustomUserDetailsServiceImpl;
 import com.enus.newsletter.service.JwtService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -23,9 +25,9 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class StompInterceptor implements ChannelInterceptor {
     private final JwtService jwtService;
-    private final UserDetailsService userDetailsService;
+    private final CustomUserDetailsServiceImpl userDetailsService;
     
-    public StompInterceptor(JwtService jwtService, UserDetailsService userDetailsService) {
+    public StompInterceptor(JwtService jwtService, CustomUserDetailsServiceImpl userDetailsService) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
     }
@@ -51,13 +53,13 @@ public class StompInterceptor implements ChannelInterceptor {
                         // extract access token from header
                         accessToken = parts[1];
                         try {
-                            String username = jwtService.extractUsername(accessToken);
-                            if (username == null) {
+                            String email = jwtService.extractEmail(accessToken);
+                            if (email == null) {
                                 log.error("Username could not be extracted from token");
                                 throw new AuthException(AuthErrorCode.INVALID_TOKEN, "Invalid token format");
                             }
                             
-                            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                            CustomUserDetailsImpl userDetails = userDetailsService.loadUserByUsername(email);
                             
                             if (jwtService.isTokenValid(accessToken, userDetails)){
                                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
@@ -68,9 +70,9 @@ public class StompInterceptor implements ChannelInterceptor {
                                 log.info("[CONNECT][{}] Authentication -> {}", sessionId, auth);
                                 accessor.setUser(auth);
                                 // SecurityContextHolder.getContext().setAuthentication(auth);
-                                log.info("[CONNECT][{}] Successfully authenticated user: {}", sessionId, username);
+                                log.info("[CONNECT][{}] Successfully authenticated user: {}", sessionId, email);
                             } else {
-                                log.error("[CONNECT][{}] Invalid token for user: {}", sessionId, username);
+                                log.error("[CONNECT][{}] Invalid token for user: {}", sessionId, email);
                                 throw new AuthException(AuthErrorCode.INVALID_TOKEN, AuthErrorCode.INVALID_TOKEN.getMessage());
                             }
                         } catch (Exception e) {
