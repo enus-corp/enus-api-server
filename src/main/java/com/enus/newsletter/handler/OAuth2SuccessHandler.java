@@ -1,10 +1,8 @@
 package com.enus.newsletter.handler;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.transaction.Transactional;
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.util.Map;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -13,14 +11,17 @@ import org.springframework.stereotype.Component;
 
 import com.enus.newsletter.db.entity.UserEntity;
 import com.enus.newsletter.db.repository.UserRepository;
-import com.enus.newsletter.interfaces.CustomUserDetailsImpl;
 import com.enus.newsletter.model.dto.UserDTO;
 import com.enus.newsletter.model.response.Token;
 import com.enus.newsletter.service.JwtService;
 import com.enus.newsletter.system.GeneralServerResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.IOException;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j(topic = "OAUTH2_SUCCESS_HANDLER")
 @Transactional
@@ -44,39 +45,49 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         log.info("Client ID -> {}", registrationId);
 
         String email = null;
-        String firstName = null;
-        String lastName = null;
-        String username = null;
+        Boolean existsByEmail = false;
 
-        switch (registrationId) {
-            case "google":
-                email = oAuth2User.getAttribute("email");
-                boolean emailVerified = oAuth2User.getAttribute("email_verified");
-                lastName = oAuth2User.getAttribute("family_name");
-                firstName = oAuth2User.getAttribute("given_name");
-                username = oAuth2User.getAttribute("sub");
+        if ("google".equals(registrationId)) {
+            email = oAuth2User.getAttribute("email");
+            boolean emailVerified = oAuth2User.getAttribute("email_verified");
+            String lastName = oAuth2User.getAttribute("family_name");
+            String firstName = oAuth2User.getAttribute("given_name");
+            String username = oAuth2User.getAttribute("sub");
 
-                break;
-        
-            default:
-                break;
+            existsByEmail = userRepository.existsByEmail(email);
+    
+            if (!existsByEmail) {
+                log.info("User not found, creating new user");
+                UserEntity userEntity = UserEntity.builder()
+                        .email(email)
+                        .username(username)
+                        .firstName(firstName)
+                        .lastName(lastName)
+                        .isOauthUser(true)
+                        .build();
+    
+                userRepository.save(userEntity);
+            }
+        } else if ("kakao".equals(registrationId)) {
+            Map<String, Object> kakaoAccount = oAuth2User.getAttribute("kakao_account");
+            if (kakaoAccount != null) {
+                email = kakaoAccount.get("email").toString();
+            }
+            String username = oAuth2User.getAttribute("id").toString();
+    
+            existsByEmail = userRepository.existsByEmail(email);
+    
+            if (!existsByEmail) {
+                log.info("User not found, creating new user");
+                UserEntity userEntity = UserEntity.builder()
+                        .email(email)
+                        .username(username)
+                        .isOauthUser(true)
+                        .build();
+    
+                userRepository.save(userEntity);
+            }
         }
-
-        Boolean userExists = userRepository.existsByEmail(email);
-
-        UserEntity userEntity = null;
-        if (!userExists) {
-            log.info("User not found, creating new user");
-            userEntity = UserEntity.builder()
-                    .email(email)
-                    .username(username)
-                    .firstName(firstName)
-                    .lastName(lastName)
-                    .isOauthUser(true)
-                    .build();
-
-            userRepository.save(userEntity);
-        } 
 
         // Generate JWT token
         UserDTO user = UserDTO.builder()
@@ -86,7 +97,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
-
 
         // super.onAuthenticationSuccess(request, response, authentication);
         GeneralServerResponse<Token> responseBody = new GeneralServerResponse<Token>(
