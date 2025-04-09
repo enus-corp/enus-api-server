@@ -13,4 +13,16 @@ public enum Gender {
     male,
     female,
     other
+    ;
+
+    public static Gender fromString(String gender) {
+        if (gender == null) {
+            return Gender.other;
+        }
+        return switch (gender) {
+            case "M" -> Gender.male;
+            case "F" -> Gender.female;
+            default -> Gender.other;
+        };
+    }
 }
