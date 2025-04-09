@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import com.enus.newsletter.db.entity.UserEntity;
 import com.enus.newsletter.db.repository.UserRepository;
+import com.enus.newsletter.enums.Gender;
 import com.enus.newsletter.model.dto.UserDTO;
 import com.enus.newsletter.model.response.Token;
 import com.enus.newsletter.service.JwtService;
@@ -44,66 +45,109 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         log.info("Client ID -> {}", registrationId);
 
-        String email = null;
-        Boolean existsByEmail = false;
+        // Extract user details based on the provider
+        UserDTO userDTO = extractUserDetails(registrationId, oAuth2User);
 
-        if ("google".equals(registrationId)) {
-            email = oAuth2User.getAttribute("email");
-            boolean emailVerified = oAuth2User.getAttribute("email_verified");
-            String lastName = oAuth2User.getAttribute("family_name");
-            String firstName = oAuth2User.getAttribute("given_name");
-            String username = oAuth2User.getAttribute("sub");
+        // Check if the user exists or create a new one
+        UserEntity userEntity = findOrCreateUser(userDTO);
 
-            existsByEmail = userRepository.existsByEmail(email);
-    
-            if (!existsByEmail) {
-                log.info("User not found, creating new user");
-                UserEntity userEntity = UserEntity.builder()
-                        .email(email)
-                        .username(username)
-                        .firstName(firstName)
-                        .lastName(lastName)
-                        .isOauthUser(true)
-                        .build();
-    
-                userRepository.save(userEntity);
+        // Generate JWT tokens
+        String accessToken = jwtService.generateAccessToken(userDTO);
+        String refreshToken = jwtService.generateRefreshToken(userDTO);
+
+        // Send response
+        sendSuccessResponse(response, accessToken, refreshToken);
+    }
+
+    private UserDTO extractUserDetails(String registrationId, OAuth2User oAuth2User) {
+        switch (registrationId) {
+            case "google" -> {
+                return extractGoogleUser(oAuth2User);
             }
-        } else if ("kakao".equals(registrationId)) {
-            Map<String, Object> kakaoAccount = oAuth2User.getAttribute("kakao_account");
-            if (kakaoAccount != null) {
-                email = kakaoAccount.get("email").toString();
+            case "kakao" -> {
+                return extractKakaoUser(oAuth2User);
             }
-            String username = oAuth2User.getAttribute("id").toString();
-    
-            existsByEmail = userRepository.existsByEmail(email);
-    
-            if (!existsByEmail) {
-                log.info("User not found, creating new user");
-                UserEntity userEntity = UserEntity.builder()
-                        .email(email)
-                        .username(username)
-                        .isOauthUser(true)
-                        .build();
-    
-                userRepository.save(userEntity);
+            case "naver" -> {
+                return extractNaverUser(oAuth2User);
             }
+            default -> throw new IllegalArgumentException("Invalid OAuth2 provider: " + registrationId);
+        }
+    }
+
+    private UserDTO extractGoogleUser(OAuth2User oAuth2User) {
+        String email = oAuth2User.getAttribute("email");
+        String username = oAuth2User.getAttribute("sub");
+        String firstName = oAuth2User.getAttribute("given_name");
+        String lastName = oAuth2User.getAttribute("family_name");
+
+        return UserDTO.builder()
+                .email(email)
+                .username(username)
+                .firstName(firstName)
+                .lastName(lastName)
+                .isOauthUser(true)
+                .build();
+    }
+
+    private UserDTO extractKakaoUser(OAuth2User oAuth2User) {
+        Map<String, Object> kakaoAccount = oAuth2User.getAttribute("kakao_account");
+        if (kakaoAccount == null) {
+            throw new IllegalArgumentException("Kakao account details are missing");
         }
 
-        // Generate JWT token
-        UserDTO user = UserDTO.builder()
-            .email(email)
-            .isOauthUser(true)
-            .build(); 
+        String email = (String) kakaoAccount.get("email");
+        String username = oAuth2User.getAttribute("id").toString();
 
-        String accessToken = jwtService.generateAccessToken(user);
-        String refreshToken = jwtService.generateRefreshToken(user);
+        return UserDTO.builder()
+                .email(email)
+                .username(username)
+                .isOauthUser(true)
+                .build();
+    }
 
-        // super.onAuthenticationSuccess(request, response, authentication);
-        GeneralServerResponse<Token> responseBody = new GeneralServerResponse<Token>(
-            false,
-            "Successfully authenticated user",
-            200,
-            Token.builder().accessToken(accessToken).refreshToken(refreshToken).build()
+    private UserDTO extractNaverUser(OAuth2User oAuth2User) {
+        Map<String, Object> response = oAuth2User.getAttribute("response");
+        if (response == null) {
+            throw new IllegalArgumentException("Naver response details are missing");
+        }
+
+        String email = (String) response.get("email");
+        String username = (String) response.get("id");
+        String genderString = (String) response.get("gender");
+        Gender gender = Gender.fromString(genderString);
+
+        return UserDTO.builder()
+                .email(email)
+                .username(username)
+                .isOauthUser(true)
+                .build();
+    }
+
+    private UserEntity findOrCreateUser(UserDTO userDTO) {
+        boolean existsByEmail = userRepository.existsByEmail(userDTO.getEmail());
+        if (existsByEmail) {
+            log.info("User already exists: {}", userDTO.getEmail());
+            return userRepository.findByEmail(userDTO.getEmail());
+        }
+
+        log.info("User not found, creating new user");
+        UserEntity userEntity = UserEntity.builder()
+                .email(userDTO.getEmail())
+                .username(userDTO.getUsername())
+                .firstName(userDTO.getFirstName())
+                .lastName(userDTO.getLastName())
+                .isOauthUser(userDTO.isOauthUser())
+                .build();
+
+        return userRepository.save(userEntity);
+    }
+
+    private void sendSuccessResponse(HttpServletResponse response, String accessToken, String refreshToken) throws IOException {
+        GeneralServerResponse<Token> responseBody = new GeneralServerResponse<>(
+                false,
+                "Successfully authenticated user",
+                200,
+                Token.builder().accessToken(accessToken).refreshToken(refreshToken).build()
         );
 
         response.setContentType("application/json");
