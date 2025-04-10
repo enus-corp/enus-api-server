@@ -1,5 +1,6 @@
 package com.enus.newsletter.model.dto;
 
+import com.enus.newsletter.enums.Gender;
 import com.enus.newsletter.interfaces.ICustomUserDetails;
 
 import lombok.AllArgsConstructor;
@@ -20,6 +21,7 @@ public class UserDTO implements ICustomUserDetails {
     private final String username;
     private final String password;
     private final String email;
+    private final Gender gender;
     private final boolean isOauthUser;
 
     @Override
