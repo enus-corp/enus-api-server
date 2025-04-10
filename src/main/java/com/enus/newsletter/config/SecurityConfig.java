@@ -2,6 +2,7 @@ package com.enus.newsletter.config;
 
 import java.util.List;
 
+import com.enus.newsletter.handler.OAuth2FailHandler;
 import com.enus.newsletter.handler.OAuth2SuccessHandler;
 import com.enus.newsletter.service.CustomUserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
@@ -30,6 +31,7 @@ import lombok.extern.log4j.Log4j2;
 public class SecurityConfig {
     private final PasswordEncoder passwordEncoder;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final OAuth2FailHandler oAuth2FailHandler;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
     private final CustomUserDetailsServiceImpl userDetailsService;
 
@@ -37,9 +39,11 @@ public class SecurityConfig {
             PasswordEncoder passwordEncoder,
             JwtAuthenticationFilter jwtAuthenticationFilter, 
             ClientRegistrationRepository clientRegistrationRepository, 
+            OAuth2FailHandler oAuth2FailHandler,
             OAuth2SuccessHandler oAuth2SuccessHandler,
             CustomUserDetailsServiceImpl userDetailsService
     ) {
+        this.oAuth2FailHandler = oAuth2FailHandler;
         this.passwordEncoder = passwordEncoder;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.oAuth2SuccessHandler = oAuth2SuccessHandler;
@@ -67,6 +71,7 @@ public class SecurityConfig {
                 .oauth2Login(config ->
                         config
                                 .successHandler(oAuth2SuccessHandler)
+                                .failureHandler(oAuth2FailHandler)
                                 .authorizationEndpoint(authorizationEndpointConfig -> authorizationEndpointConfig.baseUri("/oauth2/authorization"))
                                 .redirectionEndpoint(redirectionEndpointConfig -> redirectionEndpointConfig.baseUri("/login/oauth2/code/*"))
                 ) // add OAuth2LoginAuthenticationFilter
@@ -80,6 +85,8 @@ public class SecurityConfig {
                                         "/v3/api-docs/**",
                                         // Authentication
                                         "/api/auth/**",
+                                        // OAuth
+                                        "/api/oauth/**",
                                         // Error
                                         "/error",
                                         "/ws/**"

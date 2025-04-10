@@ -48,15 +48,20 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         // Extract user details based on the provider
         UserDTO userDTO = extractUserDetails(registrationId, oAuth2User);
 
-        // Check if the user exists or create a new one
-        UserEntity userEntity = findOrCreateUser(userDTO);
+        // TODO. create oauth service and delegate the user checking and token generation
+        // Call the controller logic to handle the user creation and token generation
+        String redirectionUrl = "/api/oauth/success";
+        response.sendRedirect(redirectionUrl);
 
-        // Generate JWT tokens
-        String accessToken = jwtService.generateAccessToken(userDTO);
-        String refreshToken = jwtService.generateRefreshToken(userDTO);
+        // // Check if the user exists or create a new one
+        // UserEntity userEntity = findOrCreateUser(userDTO);
+
+        // // Generate JWT tokens
+        // String accessToken = jwtService.generateAccessToken(userDTO);
+        // String refreshToken = jwtService.generateRefreshToken(userDTO);
 
         // Send response
-        sendSuccessResponse(response, accessToken, refreshToken);
+        // sendSuccessResponse(response, accessToken, refreshToken);
     }
 
     private UserDTO extractUserDetails(String registrationId, OAuth2User oAuth2User) {
@@ -120,6 +125,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 .email(email)
                 .username(username)
                 .isOauthUser(true)
+                .gender(gender)
                 .build();
     }
 
@@ -140,6 +146,12 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 .build();
 
         return userRepository.save(userEntity);
+    }
+
+    private void redirect(HttpServletResponse response) throws IOException {
+        log.info("Redirecting to success page");
+
+        response.sendRedirect("/api/oauth/success");
     }
 
     private void sendSuccessResponse(HttpServletResponse response, String accessToken, String refreshToken) throws IOException {
