@@ -36,6 +36,11 @@ import lombok.*;
 @Builder
 public class UserEntity extends BaseEntity {
 
+    public UserEntity(@NotBlank @Email String email) {
+        this.email = email;
+        this.isOauthUser = true;
+    }
+
     public UserEntity(
             @NotBlank @Size(max = 50) String firstName,
             @NotBlank @Size(max = 50) String lastName,
