@@ -37,6 +37,12 @@ public class UserRepository extends AbsBaseRepository<UserEntity, IUserRepositor
         return repository.existsByEmail(email);
     }
 
+    public UserEntity createUserByEmail(String email) {
+        return repository.save(
+            new UserEntity(email)
+            );
+    }
+
     public UserEntity findByEmail(String email) {
         return repository.findByEmail(email)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
