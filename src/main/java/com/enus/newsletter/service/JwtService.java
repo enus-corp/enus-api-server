@@ -34,7 +34,34 @@ public class JwtService {
     * ==============
     * */
 
-    // Entry point
+    public String generateTokenByEmail(String token) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("type", "ACCESS");
+        claims.put("role", "USER");
+        return Jwts
+                .builder()
+                .claims(claims)
+                .subject(token)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + accessTokenExpiration))
+                .signWith(getSignInKey())
+                .compact();
+    }
+    
+    public String generateRefreshTokenByEmail(String token) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("type", "REFRESH");
+        claims.put("jti", UUID.randomUUID().toString());
+        return Jwts
+                .builder()
+                .claims(claims)
+                .subject(token)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + refreshTokenExpiration))
+                .signWith(getSignInKey())
+                .compact();
+    }
+    
     public String generateAccessToken(ICustomUserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("type", "ACCESS");
@@ -68,11 +95,22 @@ public class JwtService {
         return (email.equals(userDetails.getEmail()) && !isTokenExpired(token));
     }
 
+    public String generateTemporaryToken(String email) {
+        long expiration = 1000 * 60 * 5; // 5 minutes
+        return Jwts
+                .builder()
+                .subject(email)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(getSignInKey())
+                .compact();
+    }
     /*
     * ==============
     * Private
     * ==============
     * */
+
 
     private String buildToken(
             Map<String, Object> extraClaims,
