@@ -119,10 +119,10 @@ ALTER TABLE users
     ADD CONSTRAINT uc_user_username UNIQUE (username);
 
 -- changeset idohyeon:1739714641303-13
-CREATE INDEX idx_email ON users (email);
+-- CREATE INDEX idx_email ON users (email);
 
 -- changeset idohyeon:1739714641303-14
-CREATE INDEX idx_username ON users (username);
+-- CREATE INDEX idx_username ON users (username);
 
 -- changeset idohyeon:1739714641303-15
 ALTER TABLE password_reset_tokens
