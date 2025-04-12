@@ -116,14 +116,7 @@ public class AuthService {
                 "Authentication successful"
         );
 
-        String accessToken = jwtService.generateAccessToken(user);
-        String refreshToken = jwtService.generateRefreshToken(user);
-
-        return Token
-                .builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
+        return generateToken(user);
     }
 
     public void verifyEmail(VerifyViaEmailRequest dto) throws UserException, AuthException {
@@ -157,4 +150,22 @@ public class AuthService {
         }
     }
 
+    public void createUserByEmail(String email) throws AuthException {
+        if (userRepository.existsByEmail(email)) {
+            throw new AuthException(AuthErrorCode.EMAIL_ALREADY_EXISTS, "Email already exists");
+        }
+        userRepository.createUserByEmail(email);
+        
+    }
+
+    private Token generateToken(ICustomUserDetails userDetails) {
+        String accessToken = jwtService.generateAccessToken(userDetails);
+        String refreshToken = jwtService.generateRefreshToken(userDetails);
+
+        return Token
+                .builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
 }

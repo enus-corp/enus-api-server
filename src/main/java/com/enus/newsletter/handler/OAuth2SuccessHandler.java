@@ -9,14 +9,10 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
-import com.enus.newsletter.db.entity.UserEntity;
 import com.enus.newsletter.db.repository.UserRepository;
 import com.enus.newsletter.enums.Gender;
 import com.enus.newsletter.model.dto.UserDTO;
-import com.enus.newsletter.model.response.Token;
 import com.enus.newsletter.service.JwtService;
-import com.enus.newsletter.system.GeneralServerResponse;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,11 +25,9 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final JwtService jwtService;
-    private final UserRepository userRepository;
 
     public OAuth2SuccessHandler(JwtService jwtService, UserRepository userRepository) {
         this.jwtService = jwtService;
-        this.userRepository = userRepository;
     }
 
     @Override
@@ -48,20 +42,12 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         // Extract user details based on the provider
         UserDTO userDTO = extractUserDetails(registrationId, oAuth2User);
 
-        // TODO. create oauth service and delegate the user checking and token generation
-        // Call the controller logic to handle the user creation and token generation
-        String redirectionUrl = "/api/oauth/success";
+        // Generate a temporary token and pass to controller
+        // Controller will check if the user exists and create if the user does not exist
+        String tempToken = jwtService.generateTemporaryToken(userDTO.getEmail());
+
+        String redirectionUrl = "/api/oauth/success?state=" + tempToken;
         response.sendRedirect(redirectionUrl);
-
-        // // Check if the user exists or create a new one
-        // UserEntity userEntity = findOrCreateUser(userDTO);
-
-        // // Generate JWT tokens
-        // String accessToken = jwtService.generateAccessToken(userDTO);
-        // String refreshToken = jwtService.generateRefreshToken(userDTO);
-
-        // Send response
-        // sendSuccessResponse(response, accessToken, refreshToken);
     }
 
     private UserDTO extractUserDetails(String registrationId, OAuth2User oAuth2User) {
@@ -127,44 +113,6 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 .isOauthUser(true)
                 .gender(gender)
                 .build();
-    }
-
-    private UserEntity findOrCreateUser(UserDTO userDTO) {
-        boolean existsByEmail = userRepository.existsByEmail(userDTO.getEmail());
-        if (existsByEmail) {
-            log.info("User already exists: {}", userDTO.getEmail());
-            return userRepository.findByEmail(userDTO.getEmail());
-        }
-
-        log.info("User not found, creating new user");
-        UserEntity userEntity = UserEntity.builder()
-                .email(userDTO.getEmail())
-                .username(userDTO.getUsername())
-                .firstName(userDTO.getFirstName())
-                .lastName(userDTO.getLastName())
-                .isOauthUser(userDTO.isOauthUser())
-                .build();
-
-        return userRepository.save(userEntity);
-    }
-
-    private void redirect(HttpServletResponse response) throws IOException {
-        log.info("Redirecting to success page");
-
-        response.sendRedirect("/api/oauth/success");
-    }
-
-    private void sendSuccessResponse(HttpServletResponse response, String accessToken, String refreshToken) throws IOException {
-        GeneralServerResponse<Token> responseBody = new GeneralServerResponse<>(
-                false,
-                "Successfully authenticated user",
-                200,
-                Token.builder().accessToken(accessToken).refreshToken(refreshToken).build()
-        );
-
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        response.getWriter().write(new ObjectMapper().writeValueAsString(responseBody));
     }
 
 }
