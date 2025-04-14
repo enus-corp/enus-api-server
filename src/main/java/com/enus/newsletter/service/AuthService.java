@@ -20,6 +20,8 @@ import com.enus.newsletter.db.repository.PasswordResetTokenRepository;
 import com.enus.newsletter.db.repository.UserRepository;
 import com.enus.newsletter.exception.auth.AuthErrorCode;
 import com.enus.newsletter.exception.auth.AuthException;
+import com.enus.newsletter.exception.auth.TokenErrorCode;
+import com.enus.newsletter.exception.auth.TokenException;
 import com.enus.newsletter.exception.user.UserException;
 import com.enus.newsletter.interfaces.CustomUserDetailsImpl;
 import com.enus.newsletter.interfaces.ICustomUserDetails;
@@ -49,7 +51,7 @@ public class AuthService {
         this.jwtService = jwtService;
     }
 
-    public UserEntity signup(SignupRequest dto) throws UserException {
+    public UserEntity signup(SignupRequest dto) throws UserException, TokenException {
         log.info("Processing signup request for user: {}", dto);
 
         return userRepository.createUser(dto);
@@ -100,7 +102,7 @@ public class AuthService {
                     "Authentication failed. Invalid username or password"
             );
 
-            throw new AuthException(AuthErrorCode.INVALID_CREDENTIALS, "Authentication failed. Invalid username or password");
+            throw new TokenException(TokenErrorCode.TOKEN_NOT_VALID, TokenErrorCode.TOKEN_NOT_VALID.getMessage());
         }
 
         // get authenticated user details from the authentication result
@@ -129,10 +131,10 @@ public class AuthService {
         passwordResetTokenRepository.resetPassword(dto);
     }
 
-    public Token refreshToken(RefreshTokenRequest dto) throws UserException, AuthException {
+    public Token refreshToken(RefreshTokenRequest dto) throws UserException, AuthException, TokenException {
         String email = jwtService.extractEmail(dto.getRefreshToken());
         if (email == null) {
-            throw new AuthException(AuthErrorCode.INVALID_TOKEN, AuthErrorCode.INVALID_TOKEN.getMessage());
+            throw new TokenException(TokenErrorCode.TOKEN_NOT_VALID, TokenErrorCode.TOKEN_NOT_VALID.getMessage());
         }
         UserEntity user = userRepository.findByEmail(email);
         ICustomUserDetails userDetails = new CustomUserDetailsImpl(user);
@@ -146,7 +148,7 @@ public class AuthService {
                     .refreshToken(dto.getRefreshToken())
                     .build();
         } else {
-            throw new AuthException(AuthErrorCode.INVALID_TOKEN, "Invalid token");
+            throw new TokenException(TokenErrorCode.TOKEN_NOT_VALID, TokenErrorCode.TOKEN_NOT_VALID.getMessage());
         }
     }
 

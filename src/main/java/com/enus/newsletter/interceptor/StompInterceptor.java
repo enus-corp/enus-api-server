@@ -9,12 +9,10 @@ import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
-import com.enus.newsletter.exception.auth.AuthErrorCode;
-import com.enus.newsletter.exception.auth.AuthException;
+import com.enus.newsletter.exception.auth.TokenErrorCode;
+import com.enus.newsletter.exception.auth.TokenException;
 import com.enus.newsletter.interfaces.CustomUserDetailsImpl;
 import com.enus.newsletter.service.CustomUserDetailsServiceImpl;
 import com.enus.newsletter.service.JwtService;
@@ -46,7 +44,7 @@ public class StompInterceptor implements ChannelInterceptor {
                     String authHeader = accessor.getFirstNativeHeader("Authorization");
                     if (authHeader == null) {
                         log.error("Authorization header is missing");
-                        throw new AuthException(AuthErrorCode.INVALID_TOKEN, "Authorization header is missing");
+                        throw new TokenException(TokenErrorCode.TOKEN_NOT_VALID, "Authorization header is missing");
                     }   String[] parts = authHeader.split(" ");
                     String accessToken = "";
                     if (parts.length > 1 && "Bearer".equals(parts[0])) {
@@ -56,7 +54,7 @@ public class StompInterceptor implements ChannelInterceptor {
                             String email = jwtService.extractEmail(accessToken);
                             if (email == null) {
                                 log.error("Username could not be extracted from token");
-                                throw new AuthException(AuthErrorCode.INVALID_TOKEN, "Invalid token format");
+                                throw new TokenException(TokenErrorCode.TOKEN_NOT_VALID, "Invalid token format");
                             }
                             
                             CustomUserDetailsImpl userDetails = userDetailsService.loadUserByUsername(email);
@@ -73,15 +71,15 @@ public class StompInterceptor implements ChannelInterceptor {
                                 log.info("[CONNECT][{}] Successfully authenticated user: {}", sessionId, email);
                             } else {
                                 log.error("[CONNECT][{}] Invalid token for user: {}", sessionId, email);
-                                throw new AuthException(AuthErrorCode.INVALID_TOKEN, AuthErrorCode.INVALID_TOKEN.getMessage());
+                                throw new TokenException(TokenErrorCode.TOKEN_NOT_VALID, TokenErrorCode.TOKEN_NOT_VALID.getMessage());
                             }
                         } catch (Exception e) {
                             log.error("[CONNECT][{}][Exception] Error while authenticating user: {}", sessionId, e.getMessage());
-                            throw new AuthException(AuthErrorCode.INVALID_TOKEN, AuthErrorCode.INVALID_TOKEN.getMessage());
+                            throw new TokenException(TokenErrorCode.TOKEN_NOT_VALID, TokenErrorCode.TOKEN_NOT_VALID.getMessage());
                         }
                     } else {
                         log.error("[CONNECT][{}] Invalid Authorization header format", sessionId);
-                        throw new AuthException(AuthErrorCode.INVALID_TOKEN, AuthErrorCode.INVALID_TOKEN.getMessage());
+                        throw new TokenException(TokenErrorCode.TOKEN_NOT_VALID, TokenErrorCode.TOKEN_NOT_VALID.getMessage());
                     }
                 }
                 case SUBSCRIBE, SEND -> {
