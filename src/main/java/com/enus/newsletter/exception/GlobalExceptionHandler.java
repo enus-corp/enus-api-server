@@ -1,5 +1,6 @@
 package com.enus.newsletter.exception;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -14,8 +15,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import com.enus.newsletter.exception.auth.TokenException;
 import com.enus.newsletter.system.GeneralServerResponse;
-import com.mongodb.lang.NonNull;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,7 +37,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    // Validation handler
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         log.error("---------------- Validation error: {} ----------------", ex.getMessage());
@@ -55,6 +55,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             true,  "Validation failed", 0, errors);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @ExceptionHandler(TokenException.class)
+    public ResponseEntity<Map<String, Object>> handleTokenException(TokenException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("errorCode", ex.getErrorCode());
+        response.put("errorMessage", ex.getMessage());
+        
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
 
     @ExceptionHandler(CustomBaseException.class)
