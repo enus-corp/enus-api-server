@@ -106,6 +106,15 @@ public class UserEntity extends BaseEntity {
     @Column(nullable = true, name = "last_attempt_at")
     private LocalDateTime lastAttemptAt;
 
+    @Column(nullable = true, name = "provider")
+    private String provider;
+
+    @Column(nullable = true, name = "provider_id")
+    private String providerId;
+
+    @Column(nullable = false, name = "is_email_updated", columnDefinition = "BOOLEAN default false")
+    private boolean isEmailUpdated;
+
     @OneToMany(mappedBy ="user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ChatSessionEntity> chatSessions = new ArrayList<>();
 
