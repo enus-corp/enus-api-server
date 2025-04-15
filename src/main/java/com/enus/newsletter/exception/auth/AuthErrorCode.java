@@ -12,6 +12,8 @@ public enum AuthErrorCode implements IErrorCode {
     PASSWORD_ALREADY_USED(1008, "Password already used"),
     USERNAME_ALREADY_EXISTS(1009, "Username already exists"),
     EMAIL_ALREADY_EXISTS(1010, "Email already exists"),
+    INVALID_CREDENTIALS(1011, "Invalid credentials"),
+    USER_NOT_FOUND(1012, "User not found"),
     ;
 
 
