@@ -2,9 +2,6 @@ package com.enus.newsletter.config;
 
 import java.util.List;
 
-import com.enus.newsletter.handler.OAuth2FailHandler;
-import com.enus.newsletter.handler.OAuth2SuccessHandler;
-import com.enus.newsletter.service.CustomUserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,7 +18,11 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.enus.newsletter.auth.CustomAuthenticationProvider;
+import com.enus.newsletter.auth.oauth.CustomOauth2UserService;
 import com.enus.newsletter.filter.JwtAuthenticationFilter;
+import com.enus.newsletter.handler.OAuth2FailHandler;
+import com.enus.newsletter.handler.OAuth2SuccessHandler;
+import com.enus.newsletter.service.CustomUserDetailsServiceImpl;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -29,6 +30,8 @@ import lombok.extern.log4j.Log4j2;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    private final CustomOauth2UserService customOauth2UserService;
     private final PasswordEncoder passwordEncoder;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final OAuth2FailHandler oAuth2FailHandler;
@@ -41,6 +44,7 @@ public class SecurityConfig {
             ClientRegistrationRepository clientRegistrationRepository, 
             OAuth2FailHandler oAuth2FailHandler,
             OAuth2SuccessHandler oAuth2SuccessHandler,
+            CustomOauth2UserService customOauth2UserService,
             CustomUserDetailsServiceImpl userDetailsService
     ) {
         this.oAuth2FailHandler = oAuth2FailHandler;
@@ -48,6 +52,7 @@ public class SecurityConfig {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.oAuth2SuccessHandler = oAuth2SuccessHandler;
         this.userDetailsService = userDetailsService;
+        this.customOauth2UserService = customOauth2UserService;
     }
 
     @Bean
@@ -70,10 +75,16 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .oauth2Login(config ->
                         config
-                                .successHandler(oAuth2SuccessHandler)
-                                .failureHandler(oAuth2FailHandler)
-                                .authorizationEndpoint(authorizationEndpointConfig -> authorizationEndpointConfig.baseUri("/oauth2/authorization"))
-                                .redirectionEndpoint(redirectionEndpointConfig -> redirectionEndpointConfig.baseUri("/login/oauth2/code/*"))
+                        // Base URI for OAuth2 Authorization
+                        .authorizationEndpoint(authorizationEndpointConfig -> authorizationEndpointConfig.baseUri("/oauth2/authorization"))
+                        // Base URI for OAuth2 Redirection which is used to redirect the user from "/oauth2/authorization/{registrationId}" (after successful authentication)
+                        .redirectionEndpoint(redirectionEndpointConfig -> redirectionEndpointConfig.baseUri("/login/oauth2/code/*"))
+                        // Configures how to fetch user details from the provider
+                        .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(customOauth2UserService))
+                        // Configures what happens after successful authentication
+                        .successHandler(oAuth2SuccessHandler)
+                        // Configures what happens after failed authentication
+                        .failureHandler(oAuth2FailHandler)
                 ) // add OAuth2LoginAuthenticationFilter
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
