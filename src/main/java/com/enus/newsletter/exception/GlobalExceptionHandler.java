@@ -59,6 +59,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(TokenException.class)
     public ResponseEntity<Map<String, Object>> handleTokenException(TokenException ex) {
+        log.error("---------------- TokenException Handler: {} ----------------", ex.getMessage());
         Map<String, Object> response = new HashMap<>();
         response.put("errorCode", ex.getErrorCode());
         response.put("errorMessage", ex.getMessage());
@@ -68,7 +69,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(CustomBaseException.class)
     public ResponseEntity<GeneralServerResponse<Void>> handleException(CustomBaseException exception) {
-        log.info("---------------- Exception Handler: {} ----------------", exception.getMessage());
+        log.info("---------------- CustomBaseException Handler: {} ----------------", exception.getMessage());
         GeneralServerResponse<Void> response = new GeneralServerResponse<>(
                 true,
                 exception.getMessage(),
@@ -87,7 +88,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             500,
             null
         );
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
 }
