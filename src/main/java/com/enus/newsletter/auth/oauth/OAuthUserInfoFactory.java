@@ -5,14 +5,16 @@ import java.util.Map;
 public class OAuthUserInfoFactory {
     public static AbsOauthUserInfo getOauthUserInfo(String registrationId, Map<String, Object> attributes) {
         switch (registrationId) {
-            case "google":
+            case "google" -> {
                 return new GoogleOauthUser(attributes);
-            case "kakao":
+            }
+            case "kakao" -> {
                 return new KakaoOauthUser(attributes);
-            case "naver":
+            }
+            case "naver" -> {
                 return new NaverOauthUser(attributes);
-            default:
-                throw new IllegalArgumentException("Invalid OAuth2 provider: " + registrationId);
+            }
+            default -> throw new IllegalArgumentException("Invalid OAuth2 provider: " + registrationId);
         }
     }
 }
