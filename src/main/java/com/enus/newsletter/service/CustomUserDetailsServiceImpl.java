@@ -17,7 +17,6 @@ public class CustomUserDetailsServiceImpl implements UserDetailsService{
         this.userRepository = userRepository;
     }
 
-    // TODO. Should use use user not found exception
     @Override
     public CustomUserDetailsImpl loadUserByUsername(String email) throws UsernameNotFoundException {
         UserEntity user = userRepository.findByEmail(email)

@@ -5,6 +5,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.enus.newsletter.exception.auth.AuthErrorCode;
+import com.enus.newsletter.exception.auth.AuthException;
 import com.enus.newsletter.interfaces.CustomUserDetailsImpl;
 import com.enus.newsletter.service.CustomUserDetailsServiceImpl;
 
@@ -23,20 +25,22 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
     }
 
     @Override
-    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException, AuthException {
         String email = authentication.getPrincipal().toString();
         String password = authentication.getCredentials().toString();
 
         log.info("Authenticating user with email: {}", email);
         log.info("Password: {}", password);
 
+        // throws UsernameNotFoundException
         CustomUserDetailsImpl userDetailsImpl = (CustomUserDetailsImpl) userDetailsService.loadUserByUsername(email);
 
         if (passwordEncoder.matches(password, userDetailsImpl.getPassword())) {
+            log.info("Password matches for user: {}", email);
             return new EmailPasswordAuthenticationToken(userDetailsImpl, password);
         } else {
-            throw new AuthenticationException("Invalid credentials") {
-            };
+            log.error("Invalid credentials for user: {}", email);
+            throw new AuthException(AuthErrorCode.INVALID_CREDENTIALS, AuthErrorCode.INVALID_CREDENTIALS.getMessage());
         }
     }
 

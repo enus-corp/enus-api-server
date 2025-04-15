@@ -11,6 +11,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.enus.newsletter.auth.EmailPasswordAuthenticationToken;
@@ -79,8 +80,9 @@ public class AuthService {
                     "Authentication failed. Account is locked"
             );
 
-            throw new AuthException(AuthErrorCode.ACCOUNT_LOCKED, "Authentication failed. Account is locked");
+            throw new AuthException(AuthErrorCode.ACCOUNT_LOCKED, AuthErrorCode.ACCOUNT_LOCKED.getMessage());
         } catch (DisabledException e) {
+            log.error("Account is disabled for email: {}", dto.getEmail());
             userRepository.handleLoginAttempt(dto.getEmail(), false);
 
             loginHistoryRepository.saveLoginHistory(
@@ -90,7 +92,19 @@ public class AuthService {
                     "Authentication failed. Account is disabled"
             );
 
-            throw new AuthException(AuthErrorCode.ACCOUNT_DISABLED, "Authentication failed. Account is disabled");
+            throw new AuthException(AuthErrorCode.ACCOUNT_DISABLED, AuthErrorCode.ACCOUNT_DISABLED.getMessage());
+        } catch (UsernameNotFoundException e) {
+            log.error("User not found for email: {}", dto.getEmail());
+            userRepository.handleLoginAttempt(dto.getEmail(), false);
+
+            loginHistoryRepository.saveLoginHistory(
+                    dto.getEmail(),
+                    ip,
+                    0,
+                    "Authentication failed. User not found"
+            );
+
+            throw new AuthException(AuthErrorCode.USER_NOT_FOUND, AuthErrorCode.USER_NOT_FOUND.getMessage());
         } catch (Exception e) {
             log.error("Authentication failed for user: {}", e.getMessage());
             userRepository.handleLoginAttempt(dto.getEmail(), false);
