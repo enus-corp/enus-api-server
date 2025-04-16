@@ -1,22 +1,18 @@
 package com.enus.newsletter.controller;
 
+import java.io.IOException;
+
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.enus.newsletter.model.response.Token;
 import com.enus.newsletter.service.AuthService;
 import com.enus.newsletter.service.JwtService;
-import com.enus.newsletter.system.GeneralServerResponse;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-
-import java.io.IOException;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 
 
 @Tag(name="OAuth", description = "OAuth2 API")
@@ -52,26 +48,10 @@ public class OAuthController {
     }
 
     @GetMapping("/success")
-    public ResponseEntity<GeneralServerResponse<Token>> success(HttpServletResponse response, @RequestParam String state) throws IOException {
+    public void success(HttpServletResponse response, @RequestParam String state) throws IOException {
         log.info("OAuth2 login success");
         String email = jwtService.extractEmail(state);
         log.info("\t\t Email is : {}", email);   
         authService.createUserByEmail(email);
-        String accessToken = jwtService.generateTokenByEmail(email);
-        String refreshToken = jwtService.generateRefreshTokenByEmail(email);
-
-        Token token = Token.builder()
-            .accessToken(accessToken)
-            .refreshToken(refreshToken)
-            .build();
-
-        GeneralServerResponse<Token> responseBody = new GeneralServerResponse<>(
-            false,
-            "Successfully authenticated user",
-            200,
-            token
-        );
-
-        return ResponseEntity.ok(responseBody);
     }
 }
