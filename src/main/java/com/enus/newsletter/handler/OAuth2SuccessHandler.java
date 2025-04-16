@@ -1,6 +1,8 @@
 package com.enus.newsletter.handler;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.UUID;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -8,7 +10,11 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
+import com.enus.newsletter.auth.oauth.AbsOauthUserInfo;
+import com.enus.newsletter.auth.oauth.OAuthUserInfoFactory;
+import com.enus.newsletter.db.entity.UserEntity;
 import com.enus.newsletter.db.repository.UserRepository;
+import com.enus.newsletter.model.dto.UserDTO;
 import com.enus.newsletter.service.JwtService;
 
 import jakarta.servlet.ServletException;
@@ -36,12 +42,27 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         log.info("Client ID -> {}", registrationId);
 
-        // // Extract user details based on the provider
-        // UserDTO userDTO = extractUserDetails(registrationId, oAuth2User);
+        // generate uuid
+        String uuid = UUID.randomUUID().toString();
 
-        // // Generate a temporary token and pass to controller
-        // // Controller will check if the user exists and create if the user does not exist
-        // String tempToken = jwtService.generateTemporaryToken(userDTO.getEmail());
+        // generate temporary token
+        String tempAccessToken = jwtService.generateTemporaryToken(uuid);
+
+        
+        Map<String, Object> attributes = oAuth2User.getAttributes();
+        AbsOauthUserInfo oauthUserInfo = OAuthUserInfoFactory.getOauthUserInfo(registrationId, attributes);
+        UserEntity user = oauthUserInfo.toEntity();
+        // convert user entity to user dto
+        UserDTO userDTO = UserDTO.builder()
+        .userId(user.getId())
+        .email(user.getEmail())
+        .firstName(user.getFirstName())
+        .lastName(user.getLastName())
+        .build();
+        
+        // user UserDTO which implements ICustomUserDetails to generate access token and refresh token
+        String accessToken = jwtService.generateAccessToken(userDTO);
+        String refreshToken = jwtService.generateRefreshToken(userDTO);
 
         // String redirectionUrl = "/api/oauth/success?state=" + tempToken;
         // response.sendRedirect(redirectionUrl);

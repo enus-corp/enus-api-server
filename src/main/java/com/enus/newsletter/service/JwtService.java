@@ -1,21 +1,22 @@
 package com.enus.newsletter.service;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.Function;
+
+import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.enus.newsletter.interfaces.ICustomUserDetails;
 
-import javax.crypto.SecretKey;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-import java.util.function.Function;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
+import io.jsonwebtoken.security.Keys;
 
 @Service
 public class JwtService {
@@ -28,36 +29,24 @@ public class JwtService {
     @Value("${app.auth.jwt.refresh-token.expiration}")
     private Long refreshTokenExpiration;
 
+    @Value("${app.auth.jwt.temporary-token.expiration}")
+    private Long temporaryTokenExpiration;
+
     /*
     * ==============
     * Public
     * ==============
     * */
 
-    public String generateTokenByEmail(String token) {
+    public String genereateTempToken(String token) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("type", "ACCESS");
-        claims.put("role", "USER");
         return Jwts
                 .builder()
                 .claims(claims)
                 .subject(token)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + accessTokenExpiration))
-                .signWith(getSignInKey())
-                .compact();
-    }
-    
-    public String generateRefreshTokenByEmail(String token) {
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("type", "REFRESH");
-        claims.put("jti", UUID.randomUUID().toString());
-        return Jwts
-                .builder()
-                .claims(claims)
-                .subject(token)
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + refreshTokenExpiration))
+                .expiration(new Date(System.currentTimeMillis() + temporaryTokenExpiration))
                 .signWith(getSignInKey())
                 .compact();
     }
@@ -95,11 +84,11 @@ public class JwtService {
         return (email.equals(userDetails.getEmail()) && !isTokenExpired(token));
     }
 
-    public String generateTemporaryToken(String email) {
+    public String generateTemporaryToken(String uuid) {
         long expiration = 1000 * 60 * 5; // 5 minutes
         return Jwts
                 .builder()
-                .subject(email)
+                .subject(uuid)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSignInKey())
