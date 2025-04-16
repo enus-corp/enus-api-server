@@ -15,19 +15,19 @@ spring:
       password: ${MONGODB_PASSWORD}
       database: ${MONGODB_DATABASE}
       authentication-database: admin
-#    redis:
-#      client-name: enus-redis
-#      host: localhost
-#      port: 6379
-#      username: ${REDIS_USERNAME}
-#      password: ${REDIS_PASSWORD}
-#      timeout: 2000
-#      lettuce:
-#        pool:
-#          max-active: 8
-#          max-idle: 8
-#          min-idle: 2
-#          max-wait: -1
+    redis:
+      client-name: enus-redis
+      host: localhost
+      port: 6379
+      username: ${REDIS_USERNAME}
+      password: ${REDIS_PASSWORD}
+      timeout: 2000
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 2
+          max-wait: -1
   security:
     oauth2:
       client:
@@ -110,7 +110,6 @@ logging:
   level:
     org.springframework: info
     org.springframework.security: debug
-
 app:
   auth:
     jwt:
