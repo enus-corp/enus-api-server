@@ -1,0 +1,7 @@
+ALTER TABLE users
+    ADD COLUMN provider VARCHAR(255) NULL,
+    ADD COLUMN provider_id VARCHAR(255) NULL,
+    ADD COLUMN is_email_updated BOOLEAN DEFAULT FALSE
+;
+
+
