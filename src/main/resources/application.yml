@@ -118,8 +118,8 @@ app:
         expiration: 3600000 # 1 Hour (60 * 60 * 1000)
       refresh-token:
         expiration: 604800000 # 7 Days (60 * 60 * 24 * 7 * 1000)
-    temporary-token:
-      expiration: 300000 # 5 Minutes (60 * 5 * 1000)
+      temporary-token:
+        expiration: 300000 # 5 Minutes (60 * 5 * 1000)
   oauth2:
     redirect-uri:
       - http://localhost:3000/login/oauth2/redirect
