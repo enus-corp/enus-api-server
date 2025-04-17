@@ -120,6 +120,5 @@ app:
       temporary-token:
         expiration: 300000 # 5 Minutes (60 * 5 * 1000)
   oauth2:
-    redirect-uri:
-      - http://localhost:3000/login/oauth2/redirect
+    redirect-url: http://localhost:3000
     
