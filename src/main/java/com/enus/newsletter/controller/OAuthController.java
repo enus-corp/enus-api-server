@@ -2,16 +2,21 @@ package com.enus.newsletter.controller;
 
 import java.io.IOException;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.enus.newsletter.service.AuthService;
-import com.enus.newsletter.service.JwtService;
+import com.enus.newsletter.model.request.auth.ExchangeTokenRequest;
+import com.enus.newsletter.model.response.Token;
+import com.enus.newsletter.service.TokenService;
+import com.enus.newsletter.system.GeneralServerResponse;
 
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -21,12 +26,10 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/api/oauth")
 public class OAuthController {
 
-    private final JwtService jwtService;
-    private final AuthService authService;
+    private final TokenService tokenService;
 
-    public OAuthController(JwtService jwtService, AuthService authService) {
-        this.jwtService = jwtService;
-        this.authService = authService;
+    public OAuthController(TokenService tokenService) {
+        this.tokenService = tokenService;
     }
 
     @GetMapping("/google")
@@ -47,11 +50,16 @@ public class OAuthController {
         response.sendRedirect("/oauth2/authorization/naver");
     }
 
-    @GetMapping("/success")
-    public void success(HttpServletResponse response, @RequestParam String state) throws IOException {
-        log.info("OAuth2 login success");
-        String email = jwtService.extractEmail(state);
-        log.info("\t\t Email is : {}", email);   
-        authService.createUserByEmail(email);
+    @PostMapping("/exchange-token")
+    public ResponseEntity<GeneralServerResponse<Token>> exchangeToken(@Valid @RequestBody ExchangeTokenRequest body) throws IOException {
+        log.info("[exchangeToken()] Called");
+        Token token = tokenService.exchangeToken(body.getTempToken());
+        GeneralServerResponse<Token> response = new GeneralServerResponse<Token>(
+            false,
+            "Successfully exchanged token",
+            200,
+            token
+        );
+        return ResponseEntity.ok(response);
     }
 }
