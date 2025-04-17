@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -16,6 +17,8 @@ import com.enus.newsletter.db.entity.UserEntity;
 import com.enus.newsletter.db.repository.UserRepository;
 import com.enus.newsletter.model.dto.UserDTO;
 import com.enus.newsletter.service.JwtService;
+import com.enus.newsletter.service.TokenService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,10 +30,21 @@ import lombok.extern.slf4j.Slf4j;
 @Transactional
 @Component
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
-    private final JwtService jwtService;
+    @Value("${app.oauth2.redirect-url}")
+    private String clientUrl;
 
-    public OAuth2SuccessHandler(JwtService jwtService, UserRepository userRepository) {
+    private final JwtService jwtService;
+    private final ObjectMapper objectMapper;
+    private final TokenService tokenService;
+
+    public OAuth2SuccessHandler(
+        JwtService jwtService, 
+        UserRepository userRepository,
+        TokenService tokenService,
+        ObjectMapper objectMapper) {
         this.jwtService = jwtService;
+        this.tokenService = tokenService;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -64,7 +78,10 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String accessToken = jwtService.generateAccessToken(userDTO);
         String refreshToken = jwtService.generateRefreshToken(userDTO);
 
-        // String redirectionUrl = "/api/oauth/success?state=" + tempToken;
-        // response.sendRedirect(redirectionUrl);
+        tokenService.storeToken(tempAccessToken, accessToken, refreshToken);
+
+
+        String redirectionUrl = String.format("%s/oauth-callback?tempToken=%s", clientUrl, tempAccessToken);
+        getRedirectStrategy().sendRedirect(request, response, redirectionUrl);
     }
 }
