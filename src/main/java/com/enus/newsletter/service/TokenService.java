@@ -9,6 +9,9 @@ import com.enus.newsletter.exception.auth.TokenErrorCode;
 import com.enus.newsletter.exception.auth.TokenException;
 import com.enus.newsletter.model.response.Token;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j(topic = "TOKEN_SERVICE")
 @Service
 public class TokenService {
     private final RedisTemplate<String, String> redisTemplate;
