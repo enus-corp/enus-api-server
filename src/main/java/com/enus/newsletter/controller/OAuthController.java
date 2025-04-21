@@ -9,9 +9,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.enus.newsletter.model.dto.UserDTO;
 import com.enus.newsletter.model.request.auth.ExchangeTokenRequest;
+import com.enus.newsletter.model.response.OauthCallbackResponse;
 import com.enus.newsletter.model.response.Token;
+import com.enus.newsletter.service.JwtService;
 import com.enus.newsletter.service.TokenService;
+import com.enus.newsletter.service.UserService;
 import com.enus.newsletter.system.GeneralServerResponse;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,9 +31,13 @@ import lombok.extern.slf4j.Slf4j;
 public class OAuthController {
 
     private final TokenService tokenService;
-
-    public OAuthController(TokenService tokenService) {
+    private final JwtService jwtService;
+    private final UserService userService;
+    
+    public OAuthController(TokenService tokenService, UserService userService, JwtService jwtService) {
         this.tokenService = tokenService;
+        this.userService = userService;
+        this.jwtService = jwtService;
     }
 
     @GetMapping("/google")
@@ -51,14 +59,20 @@ public class OAuthController {
     }
 
     @PostMapping("/exchange-token")
-    public ResponseEntity<GeneralServerResponse<Token>> exchangeToken(@Valid @RequestBody ExchangeTokenRequest body) throws IOException {
+    public ResponseEntity<GeneralServerResponse<OauthCallbackResponse>> exchangeToken(@Valid @RequestBody ExchangeTokenRequest body) throws IOException {
         log.info("[exchangeToken()] Called");
         Token token = tokenService.exchangeToken(body.getTempToken());
-        GeneralServerResponse<Token> response = new GeneralServerResponse<Token>(
+        String email = jwtService.extractEmail(token.getAccessToken());
+        UserDTO user = userService.getUser(email);
+        OauthCallbackResponse callbackResponse = OauthCallbackResponse.builder()
+            .token(token)
+            .user(user)
+            .build();
+        GeneralServerResponse<OauthCallbackResponse> response = new GeneralServerResponse<>(
             false,
             "Successfully exchanged token",
             200,
-            token
+            callbackResponse
         );
         return ResponseEntity.ok(response);
     }
