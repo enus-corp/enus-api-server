@@ -69,8 +69,12 @@ public class SecurityConfig {
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
+        // Ignore security for certain request patterns
         return web -> web.ignoring()
-                .requestMatchers("/error");
+                .requestMatchers("/error")
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**")
+                .requestMatchers("/ws/**")
+                ;
     }
 
     @Bean
@@ -96,18 +100,10 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                                 .requestMatchers(
-                                        // Internal testing
-                                        "/websocket-client.html",
-                                        // Swagger
-                                        "/swagger-ui/**",
-                                        "/v3/api-docs/**",
                                         // Authentication
                                         "/api/auth/**",
                                         // OAuth
-                                        "/api/oauth/**",
-                                        // Error
-                                        "/error",
-                                        "/ws/**"
+                                        "/api/oauth/**"
                                 ).permitAll()
                                 .anyRequest().authenticated()
                 )
