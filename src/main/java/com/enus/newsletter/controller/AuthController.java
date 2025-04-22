@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.enus.newsletter.db.entity.UserEntity;
 import com.enus.newsletter.model.request.auth.ResetPasswordRequest;
 import com.enus.newsletter.model.request.auth.SigninRequest;
 import com.enus.newsletter.model.request.auth.SignupRequest;
@@ -34,13 +33,13 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<GeneralServerResponse<UserEntity>> signup(@Valid @RequestBody SignupRequest dto) {
-        UserEntity user = authService.signup(dto);
-        GeneralServerResponse<UserEntity> response = new GeneralServerResponse<>(
+    public ResponseEntity<GeneralServerResponse<Void>> signup(@Valid @RequestBody SignupRequest dto) {
+        authService.signup(dto);
+        GeneralServerResponse<Void> response = new GeneralServerResponse<>(
             false,
             "Successfully created user",
             200,
-            user
+            null
         );
         return ResponseEntity.ok(response);
     }
