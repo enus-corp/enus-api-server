@@ -114,7 +114,7 @@ app:
     jwt:
       secret-key: ${JWT_SECRET_KEY}
       access-token:
-        expiration: 3600000 # 1 Hour (60 * 60 * 1000)
+        expiration: 60000 # 1 Hour (60 * 60 * 1000)
       refresh-token:
         expiration: 604800000 # 7 Days (60 * 60 * 24 * 7 * 1000)
       temporary-token:
