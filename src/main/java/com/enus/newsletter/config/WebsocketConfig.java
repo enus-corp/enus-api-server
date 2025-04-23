@@ -60,7 +60,7 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
         // client will connect to this endpoint
         // TODO. Should not use setAllowedOriginPatterns("*") in production
         registry.addEndpoint("/ws")
-                .setAllowedOriginPatterns("*")
+                .setAllowedOrigins("http://localhost:3000")
                 .withSockJS();
     }
 
