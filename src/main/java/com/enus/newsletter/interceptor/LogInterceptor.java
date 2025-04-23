@@ -37,34 +37,28 @@ public class LogInterceptor implements HandlerInterceptor {
                 Request Method: {}
                 =====================================================
                 """,
-                request.getRequestURL(), request.getMethod());
+                request.getRequestURL(), 
+                request.getMethod()
+                );
+
 
         return true;
     }
 
-    // @Override
-    // public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
-    //     log.info("""
-    //             \n\n
-    //             ==================== Response Log ====================
-    //             Response Status: {}
-    //             Response Headers: {}
-    //             =====================================================
-    //             """,
-    //             response.getStatus(), getResponseHeadersAsString(response));
-    // }
-
-    // @Override
-    // public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-    //     log.info("""
-    //             \n\n
-    //             ==================== After Completion Log ====================
-    //             Request URL: {}
-    //             Request Method: {}
-    //             Response Status: {}
-    //             Exception: {}
-    //             ==============================================================
-    //             """,
-    //             request.getRequestURL(), request.getMethod(), response.getStatus(), ex);
-    // }
+    @Override
+    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
+        ResponseWrapper responseWrapper = new ResponseWrapper(response);
+        log.info("""
+                \n\n
+                ==================== Response Log ====================
+                Response Status: {}
+                Response Headers: {}
+                Response Body: {}
+                =====================================================
+                """,
+                response.getStatus(), 
+                getResponseHeadersAsString(response),
+                responseWrapper.getBody()
+                );
+    }
 }
