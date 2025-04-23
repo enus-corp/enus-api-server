@@ -14,6 +14,7 @@ public enum AuthErrorCode implements IErrorCode {
     EMAIL_ALREADY_EXISTS(1010, "Email already exists"),
     INVALID_CREDENTIALS(1011, "Invalid credentials"),
     USER_NOT_FOUND(1012, "User not found"),
+    CREATE_USER_FAILED(1013, "Failed to create user"),
     ;
 
 

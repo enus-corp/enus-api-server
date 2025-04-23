@@ -58,7 +58,7 @@ public class UserRepository extends AbsBaseRepository<UserEntity, IUserRepositor
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
     }
 
-    public UserEntity createUser(SignupRequest dto) throws UserException {
+    public UserEntity createUser(SignupRequest dto) throws AuthException {
         if (repository.existsByUsername(dto.getUsername()) ) {
             throw new AuthException(AuthErrorCode.USERNAME_ALREADY_EXISTS, AuthErrorCode.USERNAME_ALREADY_EXISTS.getMessage());
         }
@@ -83,7 +83,7 @@ public class UserRepository extends AbsBaseRepository<UserEntity, IUserRepositor
 
         } catch (Exception e) {
             log.error("Failed to create user: {}", dto.getUsername(), e);
-            throw new UserException(UserErrorCode.CREATE_USER_FAILED, e.getMessage());
+            throw new AuthException(AuthErrorCode.CREATE_USER_FAILED, e.getMessage());
         }
     }
 
