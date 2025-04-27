@@ -38,7 +38,7 @@ public class UserService {
             .build();
     }
 
-    public void updateUser(String email, UpdateUserRequest request) {
+    public UserDTO updateUser(String email, UpdateUserRequest request) {
         UserEntity user = userRepository.findByEmail(email);
         
         user.setFirstName(request.getFirstName());
@@ -55,7 +55,17 @@ public class UserService {
         user.setGender(Gender.valueOf(request.getGender()));
         user.setAge(request.getAge());
 
-        userRepository.save(user);
+        UserEntity updatedUser = userRepository.save(user);
+
+        return UserDTO.builder()
+            .userId(updatedUser.getId())
+            .firstName(updatedUser.getFirstName())
+            .lastName(updatedUser.getLastName())
+            .username(updatedUser.getUsername())
+            .email(updatedUser.getEmail())
+            .gender(updatedUser.getGender())
+            .isOauthUser(updatedUser.isOauthUser())
+            .build();
     }
 
 }

@@ -40,10 +40,10 @@ public class UserController {
         return ResponseEntity.ok(new GeneralServerResponse<>(false, null, 0, user));
     }
     @PutMapping("/update")
-    public ResponseEntity<GeneralServerResponse<Void>> updateUser(@AuthenticationPrincipal CustomUserDetailsImpl currentUser, @Valid @RequestBody UpdateUserRequest body) {
+    public ResponseEntity<GeneralServerResponse<UserDTO>> updateUser(@AuthenticationPrincipal CustomUserDetailsImpl currentUser, @Valid @RequestBody UpdateUserRequest body) {
         log.info("[UserController][UpdateUser] Updating user info");
-        userService.updateUser(currentUser.getEmail(), body);
-        return ResponseEntity.ok(new GeneralServerResponse<>(false, "Successfully updated user information", 0, null));
+        UserDTO user = userService.updateUser(currentUser.getEmail(), body);
+        return ResponseEntity.ok(new GeneralServerResponse<>(false, "Successfully updated user information", 0, user));
     }
 
     @DeleteMapping("/delete")
