@@ -1,4 +1,3 @@
-version: '3'
 services:
   artemis:
     image: apache/activemq-artemis

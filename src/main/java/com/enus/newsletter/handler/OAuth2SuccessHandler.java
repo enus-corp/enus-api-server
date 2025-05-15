@@ -18,7 +18,6 @@ import com.enus.newsletter.db.repository.UserRepository;
 import com.enus.newsletter.model.dto.UserDTO;
 import com.enus.newsletter.service.JwtService;
 import com.enus.newsletter.service.TokenService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,17 +33,14 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     private String clientUrl;
 
     private final JwtService jwtService;
-    private final ObjectMapper objectMapper;
     private final TokenService tokenService;
 
     public OAuth2SuccessHandler(
         JwtService jwtService, 
         UserRepository userRepository,
-        TokenService tokenService,
-        ObjectMapper objectMapper) {
+        TokenService tokenService) {
         this.jwtService = jwtService;
         this.tokenService = tokenService;
-        this.objectMapper = objectMapper;
     }
 
     @Override
